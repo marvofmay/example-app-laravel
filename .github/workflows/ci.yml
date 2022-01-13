@@ -4,31 +4,26 @@ on:
   pull_request:
     branches: [ main ]
 name: CI
+
 jobs:
+  env:
+    DB_DATABASE: test_db
+    DB_USER: root
+    DB_PASSWORD: root    
   phpunit:
     runs-on: ubuntu-latest
     container:
       image: kirschbaumdevelopment/laravel-test-runner:7.4
  
-    services:
-        mysql:
-            env:
-              DB_DATABASE: test_db
-              DB_USER: root
-              DB_PASSWORD: root
-            steps:
-              - name: Set up MySQL
-                run: |
-                  sudo /etc/init.d/mysql start
-                  mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
-            ports:
-              - 33306:3306
-            options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
- 
     steps:
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
+        
+    - name: Set up MySQL
+      run: |
+        sudo /etc/init.d/mysql start
+        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}        
  
     - name: Install composer dependencies
       run: |
