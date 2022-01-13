@@ -87,7 +87,7 @@ jobs:
       - name: PHP Version
         run: php --version
 
-      - name: Execute tests (Unit and Feature tests) via PHPUnit
+      - name: Execute tests VIA Laravel
         # Set environment
         env:
           DB_CONNECTION: mysql
@@ -95,7 +95,7 @@ jobs:
           DB_PORT: 33306
           DB_USER: root
 
-        run: vendor/bin/phpunit --testdox
+        run: php artisan test
 
 
 
