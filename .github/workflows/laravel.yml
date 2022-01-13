@@ -27,7 +27,7 @@ jobs:
     - name: Clear Config
       run: php artisan config:clear
     - name: Run Migration
-      run: php artisan migrate -v     
+      run: php artisan migrate  
     - name: Create Database
       run: |
         mkdir -p database
