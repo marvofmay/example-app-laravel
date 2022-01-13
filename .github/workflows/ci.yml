@@ -31,8 +31,6 @@ jobs:
  
     - name: Prepare Laravel Application
       run: |
-        cp .env.testing .env.testing
-        cp .env .env
         php artisan key:generate
         
     - name: Directory Permissions
