@@ -11,14 +11,19 @@ jobs:
       image: kirschbaumdevelopment/laravel-test-runner:7.4
  
     services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: laravel
-        ports:
-          - 33306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        mysql:
+            env:
+              DB_DATABASE: test_db
+              DB_USER: root
+              DB_PASSWORD: root
+            steps:
+              - name: Set up MySQL
+                run: |
+                  sudo /etc/init.d/mysql start
+                  mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+            ports:
+              - 33306:3306
+            options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
  
     steps:
     - uses: actions/checkout@v1
