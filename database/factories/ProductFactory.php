@@ -23,14 +23,14 @@ class ProductFactory extends Factory
     public function definition()
     {
         $name = 'product ' . $this->faker->uuid();
-        
+
         return [
             'name' => $name,
-            'description' => 'product description for ' . $name,            
-            'slug' => Str::slug($name),  
+            'description' => 'product description for ' . $name,
+            'slug' => Str::slug($name),
             'category_id' => \App\Models\Category::factory()->create(),
-            'active' =>  rand(0, 1), 
-            'deleted' => rand(0, 1) 
+            'active' =>  rand(0, 1),
+            'deleted' => rand(0, 1)
         ];
     }
 }

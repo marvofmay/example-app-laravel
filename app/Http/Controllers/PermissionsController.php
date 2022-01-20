@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission;
 
 class PermissionsController extends Controller
@@ -14,11 +13,12 @@ class PermissionsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {   
+    {
         $permissions = Permission::all();
 
         return view(
-            'permissions.index', [
+            'permissions.index',
+            [
             'permissions' => $permissions
             ]
         );
@@ -26,11 +26,11 @@ class PermissionsController extends Controller
 
     /**
      * Show form for creating permissions
-     * 
+     *
      * @return \Illuminate\Http\Response
      */
-    public function create() 
-    {   
+    public function create()
+    {
         return view('permissions.create');
     }
 
@@ -41,7 +41,7 @@ class PermissionsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
+    {
         $request->validate(
             [
             'name' => 'required|unique:users,name'
@@ -63,7 +63,8 @@ class PermissionsController extends Controller
     public function edit(Permission $permission)
     {
         return view(
-            'permissions.edit', [
+            'permissions.edit',
+            [
             'permission' => $permission
             ]
         );
@@ -93,7 +94,7 @@ class PermissionsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Post $post
+     * @param  App\Models\Post $post
      * @return \Illuminate\Http\Response
      */
     public function destroy(Permission $permission)

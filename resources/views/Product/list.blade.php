@@ -14,7 +14,7 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach ($items as $key => $item)            
+            @foreach ($filtredItems as $key => $item)            
                 <tr>
                     <td>
                         <a href="{{ route('product_display', ['phrase' => $item->slug]) }}">
@@ -43,6 +43,7 @@
             @endforeach
             <tbody>
         </table>
+        @include('layouts.partials.pagination')  
     @else
         <h4>brak produktów</h4>
     @endif    

@@ -14,7 +14,7 @@ class Product extends Model
     use Sluggable;
     
     protected $table = 'product';
-    
+
     public function sluggable()
     {
         return [
@@ -22,8 +22,8 @@ class Product extends Model
                 'source' => 'title'
             ]
         ];
-    }       
-    
+    }
+
     public function getName()
     {
         return $this->name;
@@ -33,25 +33,26 @@ class Product extends Model
     {
         return $this->slug;
     }
-    
+
     public function category()
     {
         return $this->belongsTo(Category::class);
-    }    
-    
+    }
+
     public function photos()
-    {        
-        return $this->hasMany(Photo::class);        
-    }    
-    
+    {
+        return $this->hasMany(Photo::class);
+    }
+
     public function getMainPhoto()
-    {        
+    {
+
         foreach ($this->photos as $photo) {
             if ($photo->main) {
                 return $photo;
-            }                 
+            }
         }
-        
+
         return null;
-    }      
+    }
 }

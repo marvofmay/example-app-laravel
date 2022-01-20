@@ -38,8 +38,8 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/login', [LoginController::class, 'show'])->name('login.show');
 Route::post('/login', [LoginController::class, 'login'])->name('login.perform');
 
-Route::get('/', [HomeController::class, 'index'])->name('home_index');       
-Route::get('/test/queue', [TestController::class, 'queue'])->name('test_queue');        
+Route::get('/', [HomeController::class, 'index'])->name('home_index');
+Route::get('/test/queue', [TestController::class, 'queue'])->name('test_queue');
 
 Route::get('/products/{phrase?}', [ProductController::class, 'list'])->name('product_list');
 Route::get('/product/show/{phrase}', [ProductController::class, 'display'])->name('product_display');
@@ -64,13 +64,11 @@ Route::post('/contact/sendemail', [ContactController::class, 'sendemail'])->name
 Route::post('/contact/sendsms', [ContactController::class, 'sendsms'])->name('send_contact_form_by_sms');
 
 
-Route::group(['namespace' => 'App\Http\Controllers'], function()
-{           
-    Route::group(['middleware' => ['guest']], function() {
+Route::group(['namespace' => 'App\Http\Controllers'], function () {
+    Route::group(['middleware' => ['guest']], function () {
+    });
 
-    });    
-    
-    Route::group(['middleware' => ['auth', 'permission']], function() {
+    Route::group(['middleware' => ['auth', 'permission']], function () {
         /**
          * Logout Routes
          */
@@ -78,7 +76,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         /**
          * User Routes
          */
-        Route::group(['prefix' => 'users'], function() {
+        Route::group(['prefix' => 'users'], function () {
             Route::get('/', 'UsersController@index')->name('users.index');
             Route::get('/create', 'UsersController@create')->name('users.create');
             Route::post('/create', 'UsersController@store')->name('users.store');
@@ -90,7 +88,7 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
         /**
          * User Routes
          */
-        Route::group(['prefix' => 'posts'], function() {
+        Route::group(['prefix' => 'posts'], function () {
             Route::get('/', 'PostsController@index')->name('posts.index');
             Route::get('/create', 'PostsController@create')->name('posts.create');
             Route::post('/create', 'PostsController@store')->name('posts.store');
@@ -99,17 +97,15 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
             Route::patch('/{post}/update', 'PostsController@update')->name('posts.update');
             Route::delete('/{post}/delete', 'PostsController@destroy')->name('posts.destroy');
         });
-        
+
         /**
          * Message Routes
          */
-        Route::group(['prefix' => 'messages'], function() {
+        Route::group(['prefix' => 'messages'], function () {
             Route::get('/', 'ContactController@index')->name('contact_list');
-        });        
+        });
 
         Route::resource('roles', RolesController::class);
         Route::resource('permissions', PermissionsController::class);
     });
 });
-
-

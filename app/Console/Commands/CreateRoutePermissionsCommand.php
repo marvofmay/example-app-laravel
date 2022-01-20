@@ -52,5 +52,7 @@ class CreateRoutePermissionsCommand extends Command
         }
 
         $this->info('Permission routes added successfully.');
+
+        return 0;
     }
 }

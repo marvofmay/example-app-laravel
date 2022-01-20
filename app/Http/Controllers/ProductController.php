@@ -24,190 +24,235 @@ use Illuminate\Support\Facades\File;
  */
 class ProductController extends Controller
 {
-
-    public function list(Request $request, string $phrase = null)
-    {        
+    public function list(Request $request, string $str = null)
+    {
         
+        $onPage = 10;
+        $phrase = null;
+        $offset = null;
+        $column = null;
+        $order = null;
+        $filtredItems = [];
+        
+        /*
         if (is_null($phrase)) {
             $sql1 = Product::all();
-        } else {           
+        } else {
             $sql2 = Product::join('category', 'product.category_id', '=', 'category.id')->where('category.slug', '=', $phrase)->get('product.*');
-        }    
-        
-        $items = is_null($phrase) ? $sql1 : $sql2;        
-        
+        }
+        */
+         
+        foreach (explode('&', $str) as $item) {
+            $arr = explode('=', $item);
+            if (count($arr) > 1) {
+                ${$arr[0]} = $arr[1];
+            }
+        }
+
+        $items = Product::all();
         if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
             return $items;
         }
-        
+        if (!is_null($phrase)) {
+            $filtredItems = Product::where('name', 'LIKE', '%' . $phrase . '%')->get();
+            $foundedItems = count($filtredItems);
+        } else {
+            $filtredItems = $items;
+            $foundedItems = count($items);
+        }
+
+        if (!is_null($column)) {
+            if (is_null($order) || $order == 'asc') {
+                $filtredItems = $filtredItems->sortBy($column);
+            }
+            if ($order == 'desc') {
+                $filtredItems = $filtredItems->sortByDesc($column);
+            }
+        } else {
+            $filtredItems = $filtredItems->sortBy('name');
+        }
+
+        if (!is_null($offset)) {
+            $filtredItems = $filtredItems->skip($offset);
+        }
+        $filtredItems = $filtredItems->take($onPage);
+
+        //dd($filtredItems);
         return view(
-            'Product.list', 
-            ['page' => 'LISTA PRODUKTÓW', 'items' => $items]
+            'Product.list',
+            [
+                'page' => 'LISTA PRODUKTÓW',
+                'page_list' => 'product_list',
+                'phrase' => $phrase,
+                'str' => $str,
+                'items' => $items,
+                'offset' => $offset,
+                'filtredItems' => $filtredItems,
+                'foundedItems' => $foundedItems,
+                'pagination' => new \App\Helper\pagination\Pagination($onPage, 5, count(Category::all()), $foundedItems, $offset)
+            ]
         );
     }
-    
+
     public function display($phrase)
-    {        
-        
-        $item = DB::select('SELECT * FROM `product` WHERE `slug` = ?', [$phrase]); 
+    {
+        $item = DB::select('SELECT * FROM `product` WHERE `slug` = ?', [$phrase]);
 
         return view(
-            'Product.display', 
+            'Product.display',
             [
-                'page' => 'SZCZEGÓŁY', 
+                'page' => 'SZCZEGÓŁY',
                 'item' => $item[0]
             ]
         );
     }
-    
+
     public function create()
     {
-        
         return view(
-            'Product.create', [
+            'Product.create',
+            [
                 'page' => 'FORMULARZ DODAWANIA PRODUKTU',
                 'categories' => Category::all()->sortBy('name')
             ]
-        );        
-    }      
-    
+        );
+    }
+
     public function save(Request $request)
     {
-                    
         $request->validate(
             [
             'file' => 'required|mimes:png,jpeg,jpg|max:4096',
             'name' => 'required',
             'category_id' => 'required'
             ]
-        );            
-        
+        );
+
         $product = new Product();
-        $product->name = $request->name;        
-        $product->category_id = $request->category_id;        
+        $product->name = $request->name;
+        $product->category_id = $request->category_id;
         $product->slug = SlugService::createSlug(Product::class, 'slug', $request->name);
         $product->description = $request->description;
-        $product->save();            
-                
+        $product->save();
+
         if ($request->file()) {
             $photo = new Photo();
             $fileName = time() . '_' . $request->file->getClientOriginalName();
             $filePath = $request->file('file')->storeAs('uploads/product/' . $product->id, $fileName, 'public');
             $photo->name = $fileName;
             $photo->filepath = 'storage/' . $filePath;
-            $photo->main = true;            
+            $photo->main = true;
             $photo->product()->associate($product);
-            $photo->save();           
-        }        
-        
-        return redirect()->route('product_list');       
-    }    
-    
+            $photo->save();
+        }
+
+        return redirect()->route('product_list');
+    }
+
     public function edit(int $id)
     {
-        
         $product = Product::find($id);
-        
+
         return view(
-            'Product.edit', [
+            'Product.edit',
+            [
                 'page' => 'FORMULARZ EDYTOWANIA PRODUKTU',
                 'product' => $product,
                 'categories' => Category::all()->sortBy('name')
             ]
-        );         
-    }     
+        );
+    }
 
     public function update(int $id, Request $request)
-    {        
-        
+    {
         $product = Product::find($request->id);
-        $product->name = $request->name;        
+        $product->name = $request->name;
         $product->slug = SlugService::createSlug(Product::class, 'slug', $request->name);
         $product->category_id = $request->category_id;
         $product->description = $request->description;
         $product->deleted = isset($request->deleted);
         $product->active = isset($request->active);
         $product->save();
-        
-        $photo = $product->getMainPhoto();   
-        if ($request->file()) {                     
+
+        $photo = $product->getMainPhoto();
+        if ($request->file()) {
             $fileName = time() . '_' . $request->file->getClientOriginalName();
             $filePath = $request->file('file')->storeAs('uploads/product/' . $product->id, $fileName, 'public');
             $photo->name = time() . '_' . $request->file->getClientOriginalName();
             $photo->filepath = '/storage/' . $filePath;
-            $photo->main = true;            
+            $photo->main = true;
             $photo->product()->associate($product);
             $photo->save();
             File::link(storage_path('app/public'), public_path('storage'));
-        }         
-        
-        return redirect()->route('product_list');       
-    }   
-    
+        }
+
+        return redirect()->route('product_list');
+    }
+
     public function delete_product(Request $request)
     {
 
         //$product = Product::find($request->product_id);
         //$product->deleted = true;
-        //$product->save();        
-        
+        //$product->save();
+
         return response()->json(['success' => 'Deleted record: ' . $request->product_id]);
     }
-    
+
     public function photos($id)
     {
-        
+
         //dd(scandir('./storage'));
-        
-        $product = Product::find($id);   
+
+        $product = Product::find($id);
         $photos = $product->photos;
 
         return view(
-            'Product.Photos.photos', [
+            'Product.Photos.photos',
+            [
                 'page' => 'ZDJĘCIA PRODUKTU',
                 'product' => $product,
                 'photos' => $photos,
             ]
-        );         
-    }    
-    
+        );
+    }
+
     public function addPhotos(int $id)
     {
-        
-        $product = Product::find($id);   
+        $product = Product::find($id);
 
         return view(
-            'Product.Photos.add', [
+            'Product.Photos.add',
+            [
                 'page' => 'DODAWANIE ZDJĘĆ ZDJĘĆ PRODUKTU',
                 'product' => $product
             ]
-        );         
-    }  
-    
+        );
+    }
+
     public function savePhotos(Request $request)
     {
-        
         $request->validate(
             [
             'file' => 'required',
             'file.*' => 'mimes:png,jpeg,jpg|max:4096',
             ]
-        );                 
-        
-        $product = Product::find($request->post('product_id'));   
+        );
+
+        $product = Product::find($request->post('product_id'));
         if ($request->file() && is_object($product)) {
             foreach ($request->file('file') as $file) {
                 $photo = new Photo();
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('uploads/product/' . $product->id, $fileName, 'public');
                 $photo->name = $fileName;
-                $photo->filepath = 'storage/' . $filePath;       
+                $photo->filepath = 'storage/' . $filePath;
                 $photo->product()->associate($product);
                 $photo->save();
                 File::link(storage_path('app/public'), public_path('storage'));
             }
-        }          
+        }
 
         return [];
-    }       
+    }
 }

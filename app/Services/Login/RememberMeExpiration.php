@@ -15,11 +15,11 @@ trait RememberMeExpiration
     protected $minutesExpiration = 43200; //equivalent of 30 days
 
     /**
-     * Customize the user logged remember me expiration 
-     * 
+     * Customize the user logged remember me expiration
+     *
      * @param \Illuminate\Contracts\Auth\Authenticatable $user
      */
-    public function setRememberMeExpiration($user) 
+    public function setRememberMeExpiration($user)
     {
         Cookie::queue($this->getRememberMeSessionName(), encrypt($this->setRememberMeValue($user)), $this->minutesExpiration);
     }
@@ -29,7 +29,7 @@ trait RememberMeExpiration
      *
      * @return string
      */
-    protected function setRememberMeValue($user) 
+    protected function setRememberMeValue($user)
     {
         return $user->id . "|" . $user->remember_token . "|" . $user->password;
     }
@@ -39,7 +39,7 @@ trait RememberMeExpiration
      *
      * @return string
      */
-    protected function getRememberMeSessionName() 
+    protected function getRememberMeSessionName()
     {
         return Auth::getRecallerName();
     }

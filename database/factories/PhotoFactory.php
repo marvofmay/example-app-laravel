@@ -21,22 +21,22 @@ class PhotoFactory extends Factory
      * @return array
      */
     public function definition()
-    {        
+    {
         $product = \App\Models\Product::factory()->create();
         if (Storage::makeDirectory('public/uploads/product/' . $product->id)) {
             if (!is_dir('./storage/app/public/uploads/product/' . $product->id)) {
                 dd('ff');
             }
             $fileName = $this->faker->image('./storage/app/public/uploads/product/' . $product->id, 50, 50, null, false);
-        }        
-                       
+        }
+
         return [
             'name' => $fileName,
             'filepath' => '/storage/uploads/product/' . $product->id . '/' . $fileName,
             'product_id' => $product->id,
             'main' => 1,
-            'active' =>  rand(0, 1), 
-            'deleted' => rand(0, 1) 
+            'active' =>  rand(0, 1),
+            'deleted' => rand(0, 1)
         ];
     }
 }

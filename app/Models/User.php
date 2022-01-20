@@ -11,7 +11,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
+    use HasRoles;
 
     /**
      * The database table used by the model.
@@ -59,12 +62,11 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($value)
     {
-        $this->attributes['password'] = bcrypt($value);
+        return $this->attributes['password'] = bcrypt($value);
     }
-    
+
     public function contacts()
     {
         return $this->hasMany(Contact::class);
     }
-    
 }

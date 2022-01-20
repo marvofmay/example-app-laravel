@@ -1,11 +1,7 @@
-# GithHub Actions Workflow generated with Ghygen
-# Original configuration: http://gh-actions-yaml-generator.test?code=8fc497996543799704fb7f0b861d766f
-name: Test Mysql
+name: Testing with Mysql
 on:
   push:
-    branches:
-      - main
-
+    branches: [ main ]
 
 jobs:
   laravel-tests:

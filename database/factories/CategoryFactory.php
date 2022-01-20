@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 class CategoryFactory extends Factory
-{     
+{
     /**
      * The name of the factory's corresponding model.
      *
@@ -23,13 +23,13 @@ class CategoryFactory extends Factory
     public function definition()
     {
         $name = $this->faker->uuid();
-        
+
         return [
             'name' => 'category ' . $name,
             'description' => 'category description for ' . $name,
-            'slug' => Str::slug($name),  
-            'active' =>  rand(0, 1), 
-            'deleted' => rand(0, 1) 
+            'slug' => Str::slug($name),
+            'active' =>  rand(0, 1),
+            'deleted' => rand(0, 1)
         ];
     }
 }

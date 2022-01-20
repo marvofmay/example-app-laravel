@@ -12,7 +12,10 @@ use Illuminate\Queue\SerializesModels;
 
 class TestQueue implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     private $data;
 
@@ -32,10 +35,10 @@ class TestQueue implements ShouldQueue
      * @return void
      */
     public function handle()
-    {               
+    {
         $rand = rand(1, 100);
         $data = [
-            "name" => "category-" . $rand, 
+            "name" => "category-" . $rand,
             "description" => 'description-' . $rand,
             "slug" => 'category-' . $rand,
             "active" => rand(0, 1),

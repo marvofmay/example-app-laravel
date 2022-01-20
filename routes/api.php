@@ -30,6 +30,6 @@ Route::get('/products/{phrase?}', [ProductController::class, 'list'])->name('api
 Route::get('/categories/{phrase?}', [CategoryController::class, 'list'])->name('api_category_list');
 Route::get('/users', [UsersController::class, 'index'])->name('api_user_list');
 
-Route::group(['middleware' => ['auth:sanctum']], function() {
+Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/logout', [LogoutController::class, 'perform'])->name('api_logout');
 });

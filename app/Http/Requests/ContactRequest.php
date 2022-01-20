@@ -28,19 +28,19 @@ class ContactRequest extends FormRequest
             'message' => 'required|min:3|max:1000'
         ];
     }
-    
-     /**
-      * Get custom messages for validator errors.
-      *
-      * @return array
-      */
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
     public function messages()
     {
-         return [
+        return [
              'email.required' => __('Pole "email" jest wymagane.'),
-             'message.required' => __('Pole "wiadomość" jest wymagane.'),              
+             'message.required' => __('Pole "wiadomość" jest wymagane.'),
              'message.min' => __('Tekst wiadomości musi zawierać co najmniej 3 znaki.'),
              'message.max' => __('Tekst wiadomości może zawierać co najwyżej 1000 znaków.'),
          ];
-    }    
+    }
 }

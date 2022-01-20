@@ -9,12 +9,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Helper\category\CategoryFormCreate;
 use App\Models\Category;
-use Cviebrock\EloquentSluggable\Services\SlugService;
 use App\Http\Requests\CategoryRequest;
+use App\Services\Category\CategoryService;
+use \App\Helper\pagination\Pagination;
 
 /**
  * Description of CategoryController
@@ -23,130 +22,129 @@ use App\Http\Requests\CategoryRequest;
  */
 class CategoryController extends Controller
 {
-
     public function list(Request $request, string $str = null)
-    {        
-
-        $onPage = 2;
+    {
+        $onPage = 3;
         $phrase = null;
-        $offset = 0;
+        $offset = null;
         $column = null;
         $order = null;
         $filtredItems = [];
-        
+
         foreach (explode('&', $str) as $item) {
             $arr = explode('=', $item);
             if (count($arr) > 1) {
                 ${$arr[0]} = $arr[1];
             }
-        }     
-        
-        $items = Category::all();        
+        }
+
+        $items = (new CategoryService())->getAllCategories();
         if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
             return $items;
-        } 
-        if (isset($phrase) && !is_null($phrase)) {                    
-            $filtredItems = Category::where('name', 'LIKE', '%' . $phrase . '%')->get();          
+        }
+        
+        if (!is_null($phrase)) {
+            $filtredItems = Category::where('name', 'LIKE', '%' . $phrase . '%')->get();
             $foundedItems = count($filtredItems);
         } else {
             $filtredItems = $items;
             $foundedItems = count($items);
-        } 
-        
-        if (isset($column) && !is_null($column)) {
+        }
+
+        if (!is_null($column)) {
             if (is_null($order) || $order == 'asc') {
-                $filtredItems = $filtredItems->sortBy($column);          
-            } 
+                $filtredItems = $filtredItems->sortBy($column);
+            }
             if ($order == 'desc') {
-                $filtredItems = $filtredItems->sortByDesc($column);          
-            }             
+                $filtredItems = $filtredItems->sortByDesc($column);
+            }
         } else {
-            $filtredItems = $filtredItems->sortBy('name');          
-        }     
-          
-        if (isset($offset)) {
-            $filtredItems = $filtredItems->skip($offset);          
-        }                           
-        $filtredItems = $filtredItems->take($onPage);                                       
-        
-        return view(
-            'Category.list', 
-            [
-                'page' => 'LISTA KATEGORII', 
-                'phrase' => $phrase,
-                'str' => $str,               
-                'items' => $items,                 
-                'offset' => $offset,
-                'filtredItems' => $filtredItems,  
-                'foundedItems' => $foundedItems,                
-                'onPage' => $onPage,
-                'allButtonsPagination' => ceil($foundedItems / $onPage),
-                'pagination' => new \App\Helper\pagination\Pagination($onPage, 5, count(Category::all()), $foundedItems, $offset)
-            ]
-        );
-    }
-    
-    public function display(string $phrase)
-    {        
-        
-        $category = DB::select('SELECT * FROM `category` WHERE `slug` = ?', [$phrase]); 
+            $filtredItems = $filtredItems->sortBy('name');
+        }
+
+        if (!is_null($offset)) {
+            $filtredItems = $filtredItems->skip($offset);
+        }
+        $filtredItems = $filtredItems->take($onPage);
 
         return view(
-            'Category.display', 
+            'Category.list',
             [
-                'page' => 'SZCZEGÓŁY', 
-                'category' => $category[0]
+                'page' => 'LISTA KATEGORII',
+                'page_list' => 'category_list',
+                'phrase' => $phrase,
+                'str' => $str,
+                'items' => $items,
+                'offset' => $offset,
+                'filtredItems' => $filtredItems,
+                'foundedItems' => $foundedItems,
+                'onPage' => $onPage,
+                'pagination' => new Pagination($onPage, 5, count(Category::all()), $foundedItems, $offset)
             ]
         );
-    }   
-    
+    }
+
+    public function display(string $phrase)
+    {
+        try {
+            $category = (new CategoryService())->getCategoryBySlug($phrase);
+        } catch (CategoryNotFoundException $e) {                       
+            return false;
+        }
+
+        return view(
+            'Category.display',
+            [
+                'page' => 'SZCZEGÓŁY',
+                'category' => $category
+            ]
+        );
+    }
+
     public function create()
     {
-       
         return view(
-            'Category.create', [
+            'Category.create',
+            [
                 'page' => 'FORMULARZ DODAWANIA KATEGORII',
             ]
-        );        
-    }    
-    
-    public function save(CategoryRequest $request)
-    {                    
-        
-        $category = new Category();
-        $category->name = $request->name;        
-        $category->slug = SlugService::createSlug(Category::class, 'slug', $request->name);
-        $category->description = $request->description;
-        $category->save();
-        
-        return redirect()->route('category_list');       
+        );
     }
-    
+
+    public function save(CategoryRequest $request)
+    {
+        (new CategoryService())->storeCategoryInDB($request);
+        
+        return redirect()->route('category_list');
+    }
+
     public function edit(int $id)
     {
-        
-        $res = Category::where('id', $id)->get();
-        
+        try {
+            $category = (new CategoryService())->getCategoryById($id);
+        } catch (CategoryNotFoundException $e) {                       
+            return false;
+        }
+
         return view(
-            'Category.edit', [
+            'Category.edit',
+            [
                 'page' => 'FORMULARZ EDYTOWANIA KATEGORII',
-                'data'=> $res[0]
+                'data' => $category
             ]
-        );         
-    }        
-    
+        );
+    }
+
     public function update(int $id, CategoryRequest $request)
     {
+        try {
+            $category = (new CategoryService())->getCategoryById($id);
+        } catch (CategoryNotFoundException $e) {                       
+            return false;
+        }        
         
-        $category = Category::find($request->id);
-        $category->name = $request->name;        
-        $category->slug = SlugService::createSlug(Category::class, 'slug', $request->name);
-        $category->description = $request->description;
-        $category->deleted = isset($request->deleted);
-        $category->active = isset($request->active);
-        $category->save();
-        
-        return redirect()->route('category_list');       
-    }    
-    
+        (new CategoryService())->updateCategoryInDB($request, $category);
+
+        return redirect()->route('category_list');
+    }
 }

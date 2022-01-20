@@ -14,7 +14,8 @@ class AddEmailToContatTable extends Migration
     public function up()
     {
         Schema::table(
-            'contact', function (Blueprint $table) {
+            'contact',
+            function (Blueprint $table) {
                 $table->string('email')->index();
             }
         );
@@ -28,7 +29,8 @@ class AddEmailToContatTable extends Migration
     public function down()
     {
         Schema::table(
-            'contact', function (Blueprint $table) {
+            'contact',
+            function (Blueprint $table) {
                 //
             }
         );

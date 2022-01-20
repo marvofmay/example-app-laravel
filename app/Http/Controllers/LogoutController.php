@@ -14,18 +14,17 @@ class LogoutController extends Controller
      * @return \Illuminate\Routing\Redirector
      */
     public function perform(Request $request)
-    {                      
-                
-        Session::flush();                     
-        
+    {
+        Session::flush();
+
         if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
             Auth()->user()->tokens()->delete();
 
             return ['isLogged' => false, 'message' => 'Successfully logged out'];
         }
-        
-        Auth::logout(); 
-        
+
+        Auth::logout();
+
         return redirect()->route('login.perform');
     }
 }

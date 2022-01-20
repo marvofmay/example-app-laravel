@@ -9,9 +9,9 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class Category extends Model
 {
-    use HasFactory;  
+    use HasFactory;
     use Sluggable;
-    
+
     protected $table = 'category';
     protected $fillable = ['name', 'description', 'slug', 'active', 'deleted'];
 
@@ -19,7 +19,7 @@ class Category extends Model
      * Return the sluggable configuration array for this model.
      *
      * @return array
-     */    
+     */
     public function sluggable(): array
     {
         return [
@@ -27,8 +27,8 @@ class Category extends Model
                 'source' => 'title'
             ]
         ];
-    }    
-    
+    }
+
     public function getName()
     {
         return $this->name;
@@ -94,9 +94,9 @@ class Category extends Model
         $this->deleted = $deleted;
         return $this;
     }
-    
+
     public function products()
-    {        
-        return $this->hasMany(Product::class);        
+    {
+        return $this->hasMany(Product::class);
     }
 }

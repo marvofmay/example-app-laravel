@@ -11,14 +11,13 @@ use App\Models\Product;
  */
 class ProductModelHelper extends Product
 {
-   
     private $product;
 
     public function __construct(Product $product)
     {
         $this->product = $product;
     }
-    
+
     public function getMainPhotoURL()
     {
         $photos = $this->product->photos;
@@ -27,7 +26,7 @@ class ProductModelHelper extends Product
                 return $photo->filepath;
             }
         }
-        
+
         return false;
-    } 
+    }
 }
