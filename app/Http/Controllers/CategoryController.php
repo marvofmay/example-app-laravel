@@ -10,10 +10,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Category;
 use App\Http\Requests\CategoryRequest;
 use App\Services\Category\CategoryService;
 use \App\Helper\pagination\Pagination;
+use App\Helper\request\RequestHelper;
+use App\Exceptions\CategoryNotFoundException;
+use PDF;
 
 /**
  * Description of CategoryController
@@ -24,62 +26,37 @@ class CategoryController extends Controller
 {
     public function list(Request $request, string $str = null)
     {
-        $onPage = 3;
-        $phrase = null;
-        $offset = null;
-        $column = null;
-        $order = null;
-        $filtredItems = [];
-
-        foreach (explode('&', $str) as $item) {
-            $arr = explode('=', $item);
-            if (count($arr) > 1) {
-                ${$arr[0]} = $arr[1];
-            }
-        }
-
-        $items = (new CategoryService())->getAllCategories();
-        if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
-            return $items;
-        }
+                     
+        if (!is_null($str)) {
+            $params = RequestHelper::getParamsFromURL($str);
+            $filtredItems = (new CategoryService())->getFiltredAndSortedCategories($params);
+        } else {
+            $filtredItems = (new CategoryService())->getAllCategories();
+        }        
         
-        if (!is_null($phrase)) {
-            $filtredItems = Category::where('name', 'LIKE', '%' . $phrase . '%')->get();
-            $foundedItems = count($filtredItems);
-        } else {
-            $filtredItems = $items;
-            $foundedItems = count($items);
-        }
-
-        if (!is_null($column)) {
-            if (is_null($order) || $order == 'asc') {
-                $filtredItems = $filtredItems->sortBy($column);
-            }
-            if ($order == 'desc') {
-                $filtredItems = $filtredItems->sortByDesc($column);
-            }
-        } else {
-            $filtredItems = $filtredItems->sortBy('name');
-        }
-
-        if (!is_null($offset)) {
-            $filtredItems = $filtredItems->skip($offset);
-        }
-        $filtredItems = $filtredItems->take($onPage);
-
+        if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
+            return $filtredItems;
+        }                
+        
+        $pagination = new Pagination(
+            $filtredItems, 
+            count((new CategoryService())->getAllCategories()),
+            (isset($params) && array_key_exists('offset', $params)) ? $params['offset'] : 0
+        );  
+        $itemsToDisplayOnPage = $pagination->getItemsToDisplayOnPage();        
+        
         return view(
             'Category.list',
             [
                 'page' => 'LISTA KATEGORII',
                 'page_list' => 'category_list',
-                'phrase' => $phrase,
                 'str' => $str,
-                'items' => $items,
-                'offset' => $offset,
+                'offset' => $pagination->getOffset(),
                 'filtredItems' => $filtredItems,
-                'foundedItems' => $foundedItems,
-                'onPage' => $onPage,
-                'pagination' => new Pagination($onPage, 5, count(Category::all()), $foundedItems, $offset)
+                'itemsToDisplayOnPage' => $itemsToDisplayOnPage,
+                'foundedItems' => count($filtredItems),
+                'onPage' => $pagination->getItemsOnPage(),
+                'pagination' => $pagination
             ]
         );
     }
@@ -88,8 +65,8 @@ class CategoryController extends Controller
     {
         try {
             $category = (new CategoryService())->getCategoryBySlug($phrase);
-        } catch (CategoryNotFoundException $e) {                       
-            return false;
+        } catch (CategoryNotFoundException $e) {              
+            return $e->render();
         }
 
         return view(
@@ -113,17 +90,20 @@ class CategoryController extends Controller
 
     public function save(CategoryRequest $request)
     {
-        (new CategoryService())->storeCategoryInDB($request);
+        $cs = new CategoryService();
+        $category = $cs->prepareCategoryModel($request);
+        $cs->storeCategoryInDB($category);
         
         return redirect()->route('category_list');
     }
 
     public function edit(int $id)
     {
+        $cs = new CategoryService(); 
         try {
-            $category = (new CategoryService())->getCategoryById($id);
-        } catch (CategoryNotFoundException $e) {                       
-            return false;
+            $category = $cs->getCategoryById($id);
+        } catch (CategoryNotFoundException $e) {        
+            return $e->render();
         }
 
         return view(
@@ -137,14 +117,30 @@ class CategoryController extends Controller
 
     public function update(int $id, CategoryRequest $request)
     {
-        try {
-            $category = (new CategoryService())->getCategoryById($id);
-        } catch (CategoryNotFoundException $e) {                       
-            return false;
-        }        
-        
-        (new CategoryService())->updateCategoryInDB($request, $category);
+        $cs = new CategoryService();                
+        $category = $cs->prepareCategoryModel($request);       
+        $cs->updateCategoryInDB($category);
 
         return redirect()->route('category_list');
+    }
+    
+    public function generatePDF(int $id) {
+        
+        $cs = new CategoryService();   
+        
+        try {
+            $category = $cs->getCategoryById($id);
+        } catch (CategoryNotFoundException $e) {        
+            return $e->render();
+        }
+        
+        $data = [
+            'title' => 'Welcome to ItSolutionStuff.com',
+            'category' => $category
+        ];
+        //dd($data);
+        $pdf = PDF::loadView('category/pdf', $data);
+  
+        return $pdf->download('category.pdf');   
     }
 }

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="content">
+<div class="content mt-5">
     <div class="row">
         <div class="col-md-12">
             <h3>{{ $page }}</h3>
@@ -15,7 +15,7 @@
                         <th>akcja</th>
                     </thead>
                     <tbody>
-                    @foreach ($filtredItems as $key => $item)
+                    @foreach ($itemsToDisplayOnPage as $key => $item)
                         <tr>
                             <td>
                             (k: {{$offset + $loop->index + 1}})
@@ -29,8 +29,9 @@
                             <a href="{{ route('product_list', ['phrase' => $item->slug]) }}">({{count($item->products)}})</a>       
                             </td>
                             <td>
-                            <a href="{{ route('edit_category', ['id' => $item->id]) }}">edytuj</a>
-                            <span class="delete delete-category" data-category-id="{{$item->id}}">usuń</span>
+                            <a class="btn btn-warning" href="{{ route('edit_category', ['id' => $item->id]) }}">edytuj</a>
+                            <button class="btn btn-danger delete btn-delete-category" data-category-id="{{$item->id}}" >usuń</button>
+                            <a class="btn btn-primary" href="{{ route('pdf_category', ['id' => $item->id]) }}">pdf</a>
                             <td>
                         </tr>
                     @endforeach        

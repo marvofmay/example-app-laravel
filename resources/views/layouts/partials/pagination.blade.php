@@ -31,6 +31,7 @@
                 @endif
             @endif        
 </div>
+
             <br />
             radius: {{ $pagination->radius }}
             <br />
@@ -40,7 +41,7 @@
             <br />
             numberOfAllItems: {{ $pagination->numberOfAllItems }}
             <br />
-            foundedItems: {{ $pagination->foundedItems }}
+            foundedItems: {{ $pagination->qtyFoundedItems }}
             <br />
             startButtons: {{ $pagination->startButtons }}
             <br />

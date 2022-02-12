@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 
-class CategoryNotFoundException extends Exception
+class ProductNotFoundException extends Exception
 {
     
     public function __construct(string $message) { 
@@ -18,6 +18,6 @@ class CategoryNotFoundException extends Exception
     
     public function render () {
         
-        return view('errors.category.categoryNotFound', ['error' => $this->getMessage()]);
+        return view('errors.product.productNotFound', ['error' => $this->getMessage()]);
     }
 }

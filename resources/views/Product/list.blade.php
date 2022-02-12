@@ -2,7 +2,7 @@
 @section('content')
     <h3>{{ $page }}</h3>
     <a href="{{ route('create_product') }}" class="add-new-product btn btn-success">dodaj produkt</a>
-    @if (count($items) > 0)
+    @if (count($filtredItems) > 0)
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -14,7 +14,7 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach ($filtredItems as $key => $item)            
+            @foreach ($itemsToDisplayOnPage as $key => $item)            
                 <tr>
                     <td>
                         <a href="{{ route('product_display', ['phrase' => $item->slug]) }}">

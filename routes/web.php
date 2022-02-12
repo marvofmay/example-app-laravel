@@ -58,6 +58,7 @@ Route::get('/category/create', [CategoryController::class, 'create'])->name('cre
 Route::post('/category/save', [CategoryController::class, 'save'])->name('save_category');
 Route::get('/category/edit/{id}', [CategoryController::class, 'edit'])->name('edit_category');
 Route::put('/category/update/{id}', [CategoryController::class, 'update'])->name('update_category');
+Route::get('/category/pdf/{id}', [CategoryController::class, 'generatePDF'])->name('pdf_category');
 
 Route::get('/contact', [ContactController::class, 'display'])->name('display_contact_form');
 Route::post('/contact/sendemail', [ContactController::class, 'sendemail'])->name('send_contact_form_by_email');

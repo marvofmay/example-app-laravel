@@ -9,21 +9,41 @@ use Cviebrock\EloquentSluggable\Services\SlugService;
 
 class CategoryService {
     
-    public function __construct () {
+    public function prepareCategoryModel(Request $request): Category 
+    {
+
+        if (isset($request->id)) {
+            try {
+                $category = $this->getCategoryById($request->id);               
+            } catch (CategoryNotFoundException $e) {                       
+                return $e->render();
+            }                        
+        } else {
+            $category = new Category(); 
+        }
+                        
+        $category->name = $request->name;
+        $category->slug = SlugService::createSlug(Category::class, 'slug', $request->name);
+        $category->description = $request->description;   
+        $category->deleted = isset($request->deleted);
+        $category->active = isset($request->active);        
         
+        return $category;
     }
-    
-    public function getCategoryBySlug (string $slug) {
+
+    public function getCategoryBySlug (string $slug)
+    {
         
         $category = Category::where(['slug' => $slug])->first(); 
-        if (!$category) {
+        if (!$category) {           
             throw new CategoryNotFoundException('Category is not found by slug: "' . $slug . '"');
         }     
         
         return $category;
     }
     
-    public function getCategoryById(int $id) {
+    public function getCategoryById(int $id) 
+    {
         
          $category = Category::where('id', $id)->first();                
         if (!$category) {
@@ -33,33 +53,44 @@ class CategoryService {
         return $category;        
     }
 
-    public function getAllCategories() {
+    public function getAllCategories() 
+    {
     
         return Category::all();
     }
 
-    public function storeCategoryInDB (Request $request) {
-                
-        $category = new Category();
-        $category->name = $request->name;
-        $category->slug = SlugService::createSlug(Category::class, 'slug', $request->name);
-        $category->description = $request->description;        
-        
+    public function storeCategoryInDB (Category $category): bool 
+    {
+                                    
         return $category->save(); 
     }
     
-    public function updateCategoryInDB (Request $request, Category $category) {
+    public function updateCategoryInDB (Category $category): bool 
+    {;  
         
-        $category->name = $request->name;
-        $category->slug = SlugService::createSlug(Category::class, 'slug', $request->name);
-        $category->description = $request->description;
-        $category->deleted = isset($request->deleted);
-        $category->active = isset($request->active);
-        
-        return $category->save();        
+        return $category->update();        
     }
     
-    public function getFiltredCategories () {
+    public function getFiltredAndSortedCategories (array $params)
+    {
         
+        if (array_key_exists('phrase', $params)) {
+            $filtredItems = Category::where('name', 'LIKE', '%' . $params['phrase'] . '%')->get();
+        } else {
+            $filtredItems = $this->getAllCategories();
+        }
+
+        if (array_key_exists('column', $params)) {
+            if (array_key_exists('order', $params) || $parmas['order'] == 'asc') {
+                $filtredItems = $filtredItems->sortBy($params['column']);
+            }
+            if ($parmas['order'] == 'desc') {
+                $filtredItems = $filtredItems->sortByDesc($params['column']);
+            }
+        } else {
+            $filtredItems = $filtredItems->sortBy('name');
+        }
+                
+        return $filtredItems;
     }
 }

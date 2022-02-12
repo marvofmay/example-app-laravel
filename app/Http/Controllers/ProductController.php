@@ -12,9 +12,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use Cviebrock\EloquentSluggable\Services\SlugService;
 use App\Models\Photo;
+use App\Services\Product\ProductService;
+use App\Services\Photo\PhotoService;
+use \App\Helper\pagination\Pagination;
+use Illuminate\Http\Request;
+use App\Http\Requests\ProductRequest;
+use App\Http\Requests\PhotoRequest;
+use Cviebrock\EloquentSluggable\Services\SlugService;
+use App\Exceptions\ProductNotFoundException;
 use Illuminate\Support\Facades\File;
 
 /**
@@ -26,83 +32,54 @@ class ProductController extends Controller
 {
     public function list(Request $request, string $str = null)
     {
-        
-        $onPage = 10;
-        $phrase = null;
-        $offset = null;
-        $column = null;
-        $order = null;
-        $filtredItems = [];
-        
-        /*
-        if (is_null($phrase)) {
-            $sql1 = Product::all();
+        if (!is_null($str)) {
+            $params = RequestHelper::getParamsFromURL($str);
+            $filtredItems = (new ProductService())->getFiltredAndSortedProducts($params);
         } else {
-            $sql2 = Product::join('category', 'product.category_id', '=', 'category.id')->where('category.slug', '=', $phrase)->get('product.*');
-        }
-        */
-         
-        foreach (explode('&', $str) as $item) {
-            $arr = explode('=', $item);
-            if (count($arr) > 1) {
-                ${$arr[0]} = $arr[1];
-            }
-        }
-
-        $items = Product::all();
+            $filtredItems = (new ProductService())->getAllProducts();
+        }        
+        
         if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
-            return $items;
-        }
-        if (!is_null($phrase)) {
-            $filtredItems = Product::where('name', 'LIKE', '%' . $phrase . '%')->get();
-            $foundedItems = count($filtredItems);
-        } else {
-            $filtredItems = $items;
-            $foundedItems = count($items);
-        }
-
-        if (!is_null($column)) {
-            if (is_null($order) || $order == 'asc') {
-                $filtredItems = $filtredItems->sortBy($column);
-            }
-            if ($order == 'desc') {
-                $filtredItems = $filtredItems->sortByDesc($column);
-            }
-        } else {
-            $filtredItems = $filtredItems->sortBy('name');
-        }
-
-        if (!is_null($offset)) {
-            $filtredItems = $filtredItems->skip($offset);
-        }
-        $filtredItems = $filtredItems->take($onPage);
-
-        //dd($filtredItems);
+            return $filtredItems;
+        }                
+        
+        $pagination = new Pagination(
+            $filtredItems, 
+            count((new ProductService())->getAllProducts()),
+            (isset($params) && array_key_exists('offset', $params)) ? $params['offset'] : 0
+        );  
+        $itemsToDisplayOnPage = $pagination->getItemsToDisplayOnPage();        
+        
         return view(
             'Product.list',
             [
                 'page' => 'LISTA PRODUKTÓW',
                 'page_list' => 'product_list',
-                'phrase' => $phrase,
                 'str' => $str,
-                'items' => $items,
-                'offset' => $offset,
+                'offset' => $pagination->getOffset(),
                 'filtredItems' => $filtredItems,
-                'foundedItems' => $foundedItems,
-                'pagination' => new \App\Helper\pagination\Pagination($onPage, 5, count(Category::all()), $foundedItems, $offset)
+                'itemsToDisplayOnPage' => $itemsToDisplayOnPage,
+                'foundedItems' => count($filtredItems),
+                'onPage' => $pagination->getItemsOnPage(),
+                'pagination' => $pagination
             ]
         );
+           
     }
 
     public function display($phrase)
     {
-        $item = DB::select('SELECT * FROM `product` WHERE `slug` = ?', [$phrase]);
+        try {
+            $product = (new ProductService())->getProductBySlug($phrase);
+        } catch (ProductNotFoundException $e) {              
+            return $e->render();
+        }
 
         return view(
             'Product.display',
             [
                 'page' => 'SZCZEGÓŁY',
-                'item' => $item[0]
+                'item' => $product
             ]
         );
     }
@@ -118,35 +95,26 @@ class ProductController extends Controller
         );
     }
 
-    public function save(Request $request)
+    public function save(ProductRequest $request)
     {
-        $request->validate(
-            [
-            'file' => 'required|mimes:png,jpeg,jpg|max:4096',
-            'name' => 'required',
-            'category_id' => 'required'
-            ]
-        );
-
-        $product = new Product();
-        $product->name = $request->name;
-        $product->category_id = $request->category_id;
-        $product->slug = SlugService::createSlug(Product::class, 'slug', $request->name);
-        $product->description = $request->description;
-        $product->save();
-
-        if ($request->file()) {
-            $photo = new Photo();
-            $fileName = time() . '_' . $request->file->getClientOriginalName();
-            $filePath = $request->file('file')->storeAs('uploads/product/' . $product->id, $fileName, 'public');
-            $photo->name = $fileName;
-            $photo->filepath = 'storage/' . $filePath;
-            $photo->main = true;
-            $photo->product()->associate($product);
-            $photo->save();
-        }
-
-        return redirect()->route('product_list');
+        DB::beginTransaction();
+        
+        try {        
+           $productService = new ProductService();
+           $product = $productService->prepareProductModel($request);
+           $productService->storeProductInDB($product);
+           
+           $photoService = new PhotoService();
+           $photo = $photoService->preparePhotoModel($request, $product);
+           $photoService->storePhotoInDB($photo);           
+        } catch(\Exception $e) {
+           DB::rollback();
+           throw $e;
+        }   
+        
+        DB::commit();
+        
+        return redirect()->route('product_list');        
     }
 
     public function edit(int $id)
@@ -196,49 +164,38 @@ class ProductController extends Controller
         //$product->deleted = true;
         //$product->save();
 
-        return response()->json(['success' => 'Deleted record: ' . $request->product_id]);
+        return response()->json([
+            'success' => 'Deleted record: ' . $request->product_id
+        ]);
     }
 
     public function photos($id)
     {
 
-        //dd(scandir('./storage'));
-
         $product = Product::find($id);
         $photos = $product->photos;
 
-        return view(
-            'Product.Photos.photos',
-            [
-                'page' => 'ZDJĘCIA PRODUKTU',
-                'product' => $product,
-                'photos' => $photos,
-            ]
-        );
+        return view('Product.Photos.photos', [
+            'page' => 'ZDJĘCIA PRODUKTU',
+            'product' => $product,
+            'photos' => $photos,
+        ]);
     }
 
     public function addPhotos(int $id)
     {
-        $product = Product::find($id);
+        $productService = new ProductService();
+        $product = $productService->getProductById($id);
 
-        return view(
-            'Product.Photos.add',
-            [
+        return view('Product.Photos.add', [
                 'page' => 'DODAWANIE ZDJĘĆ ZDJĘĆ PRODUKTU',
                 'product' => $product
-            ]
-        );
+        ]);
     }
 
-    public function savePhotos(Request $request)
+    public function savePhotos(PhotoRequest $request)
     {
-        $request->validate(
-            [
-            'file' => 'required',
-            'file.*' => 'mimes:png,jpeg,jpg|max:4096',
-            ]
-        );
-
+        
         $product = Product::find($request->post('product_id'));
         if ($request->file() && is_object($product)) {
             foreach ($request->file('file') as $file) {
@@ -253,6 +210,6 @@ class ProductController extends Controller
             }
         }
 
-        return [];
+        return redirect('/product/' . $request->post('product_id') . '/photos');
     }
 }

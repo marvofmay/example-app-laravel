@@ -44,12 +44,12 @@ class Category extends Model
         return $this->slug;
     }
 
-    public function getCreated_at()
+    public function getCreatedAt()
     {
         return $this->created_at;
     }
 
-    public function getUpdated_at()
+    public function getUpdatedAt()
     {
         return $this->updated_at;
     }
@@ -77,13 +77,13 @@ class Category extends Model
         return $this;
     }
 
-    public function setCreated_at($created_at)
+    public function setCreatedAt($created_at)
     {
         $this->created_at = $created_at;
         return $this;
     }
 
-    public function setUpdated_at($updated_at)
+    public function setUpdatedAt($updated_at)
     {
         $this->updated_at = $updated_at;
         return $this;
