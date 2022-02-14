@@ -22,6 +22,7 @@ use App\Http\Requests\PhotoRequest;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 use App\Exceptions\ProductNotFoundException;
 use Illuminate\Support\Facades\File;
+use PDF;
 
 /**
  * Description of ProductController
@@ -195,8 +196,10 @@ class ProductController extends Controller
 
     public function savePhotos(PhotoRequest $request)
     {
+                
+        $productService = new ProductService();
+        $product = $productService->getProductById($request->post('product_id'));
         
-        $product = Product::find($request->post('product_id'));
         if ($request->file() && is_object($product)) {
             foreach ($request->file('file') as $file) {
                 $photo = new Photo();
@@ -212,4 +215,24 @@ class ProductController extends Controller
 
         return redirect('/product/' . $request->post('product_id') . '/photos');
     }
+
+    public function generatePDF(int $id) {
+        
+        $ps = new ProductService();   
+        
+        try {
+            $product = $ps->getProductById($id);
+        } catch (ProductNotFoundException $e) {        
+            return $e->render();
+        }
+        
+        $data = [
+            'title' => 'Welcome to ItSolutionStuff.com',
+            'product' => $product
+        ];
+        //dd($data);
+        $pdf = PDF::loadView('product/pdf/pdf', $data);
+  
+        return $pdf->download('product.pdf');   
+    }    
 }

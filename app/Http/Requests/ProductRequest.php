@@ -41,7 +41,7 @@ class ProductRequest extends FormRequest
         return [
             'name.required' => __('Pole "email" jest wymagane.'),
             'description.required' => __('Pole "opis" jest wymagane.'),
-            'category.required' => __('Pole "kategoria" jest wymagane.'),
+            'category_id.required' => __('Pole "kategoria" jest wymagane.'),
             'file.required' => __('Wskaż plik.'),
             'file.mimes' => __('Dopuszczalne formaty: png, jpeg, jpg'),
             'file.max' => __('Maksymalny rozmiar pliku: 4096kb'),            

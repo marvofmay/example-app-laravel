@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\TestQueue;
+use Elasticsearch\ClientBuilder;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
@@ -11,4 +12,13 @@ class TestController extends Controller
     {
         $this->dispatch(new TestQueue('new-queue'));
     }
+    
+    public function elastic(Request $request)
+    {
+        $client = ClientBuilder::create()->build();
+        $params['index'] = 'products_with_category';
+        $resaults = $client->search($params);
+        
+        dd($resaults['hits']['hits']);
+    }    
 }

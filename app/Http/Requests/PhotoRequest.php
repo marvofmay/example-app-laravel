@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use \Illuminate\Http\Request;
 
 class PhotoRequest extends FormRequest
 {
@@ -24,7 +25,8 @@ class PhotoRequest extends FormRequest
     public function rules()
     {
         return [
-            'file' => 'required|mimes:png,jpeg,jpg|max:4096',
+            'file' => 'required',
+            'file.*' => 'mimes:png,jpeg,jpg|max:4096',
         ];
     }
     

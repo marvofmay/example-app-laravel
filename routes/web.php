@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ContactController;
@@ -39,7 +38,9 @@ Route::get('/login', [LoginController::class, 'show'])->name('login.show');
 Route::post('/login', [LoginController::class, 'login'])->name('login.perform');
 
 Route::get('/', [HomeController::class, 'index'])->name('home_index');
+
 Route::get('/test/queue', [TestController::class, 'queue'])->name('test_queue');
+Route::get('/test/elastic', [TestController::class, 'elastic'])->name('test_elastic');
 
 Route::get('/products/{phrase?}', [ProductController::class, 'list'])->name('product_list');
 Route::get('/product/show/{phrase}', [ProductController::class, 'display'])->name('product_display');
@@ -51,6 +52,7 @@ Route::delete('/product/delete_product', [ProductController::class, 'delete_prod
 Route::get('/product/{id}/photos', [ProductController::class, 'photos'])->name('product_photos');
 Route::get('/product/{id}/photos/add', [ProductController::class, 'addPhotos'])->name('product_add_photos');
 Route::post('/product/photos/save', [ProductController::class, 'savePhotos'])->name('save_product_photos');
+Route::get('/product/pdf/{id}', [ProductController::class, 'generatePDF'])->name('pdf_product');
 
 Route::get('/categories/{phrase?}', [CategoryController::class, 'list'])->name('category_list');
 Route::get('/category/show/{phrase}', [CategoryController::class, 'display'])->name('category_display');

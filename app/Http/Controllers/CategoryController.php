@@ -139,7 +139,7 @@ class CategoryController extends Controller
             'category' => $category
         ];
         //dd($data);
-        $pdf = PDF::loadView('category/pdf', $data);
+        $pdf = PDF::loadView('category/pdf/pdf', $data);
   
         return $pdf->download('category.pdf');   
     }

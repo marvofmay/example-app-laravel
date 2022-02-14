@@ -31,13 +31,9 @@
                         <a href="{{ route('product_photos', ['id' => $item->id]) }}">{{ count($item->photos) }}</a>     
                     </td>
                     <td>
-                        <a href="{{ route('edit_product', ['id' => $item->id]) }}">edytuj</a>                
-                        <a href="#" class="delete delete-product"                    
-                           data-token="{{ csrf_token() }}"
-                           data-method="delete"
-                           data-product_id="{{ $item->id }}" >
-                           usuń 
-                        </a>                
+                        <a class="btn btn-warning" href="{{ route('edit_product', ['id' => $item->id]) }}">edytuj</a>                
+                        <button class="btn btn-danger delete btn-delete-product" data-product-id="{{$item->id}}" >usuń</button>          
+                        <a class="btn btn-primary" href="{{ route('pdf_product', ['id' => $item->id]) }}">pdf</a>
                     </td>    
                 </tr>
             @endforeach
