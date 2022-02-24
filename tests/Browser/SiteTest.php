@@ -57,7 +57,7 @@ class SiteTest extends DuskTestCase
                 ->type('name', 'lorem')
                 ->type('description', 'lorem descripton')
                 ->select('category_id', $category->id)
-                ->attach('file', storage_path('/app/public/uploads/product/1/1634550207_Przechwytywanie222.JPG'))
+                ->attach('file', storage_path('/app/public/uploads/product/test/samsung-smartfon-s22-ultra-5g-8-128-rd-samsung,98386463937_8.jpg'))
                 ->press('btn_save_product')
                 ->assertPathIs('/products')
                 ->assertSee('LISTA PRODUKTÓW');

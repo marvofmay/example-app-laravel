@@ -3,7 +3,16 @@
 @section('content')
     <h3>{{ $page }}</h3>
     <div class=row>
-        <div class="col-md-6 col-of">    
+        <div class="col-md-6 col-of">  
+            @if (count($errors) > 0)
+              <div class="alert alert-danger">
+                  <ul>
+                      @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                      @endforeach
+                  </ul>
+              </div>
+            @endif               
             <form class="form needs-validation" method="post" action="{{ route('update_product', ['id' =>  $product->id]) }}" enctype="multipart/form-data">
                 {{ method_field('PUT') }}
                 <div class="form-group row">                    

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\TestQueue;
-use Elasticsearch\ClientBuilder;
 use Illuminate\Http\Request;
+use App\Models\ProductWithCategory;
 
 class TestController extends Controller
 {
@@ -15,10 +15,17 @@ class TestController extends Controller
     
     public function elastic(Request $request)
     {
-        $client = ClientBuilder::create()->build();
-        $params['index'] = 'products_with_category';
-        $resaults = $client->search($params);
+
+        $resaults = ProductWithCategory::searchByQuery([
+            'match' => [
+                'name' => 'sony bravia'
+            ]
+        ]);
         
-        dd($resaults['hits']['hits']);
-    }    
+        foreach ($resaults as $item) {
+            echo $item->name;
+        }
+        
+        dd($resaults);
+    }        
 }

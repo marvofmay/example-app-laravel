@@ -5,4 +5,6 @@
     nazwa {{ $category->name }}
     <br />
     opis {{ $category->description }}
+    <br /><br />
+    <a class="btn btn-primary" href="{{ route('pdf_category', ['id' => $category->id]) }}">pdf</a>
 @endsection      

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hi</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>{{ $title }}</title>
     </head>
     <body>
-        <h1>{{ $category->name }}</h1>
+        <h1>{{ $title }}</h1>
+        <h2>{{ $category->name }}</h2>
         <h3>{{ $category->description }}</h3>
         <p>
         Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod

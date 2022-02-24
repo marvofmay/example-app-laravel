@@ -15,6 +15,8 @@ class CategoryService {
         if (isset($request->id)) {
             try {
                 $category = $this->getCategoryById($request->id);               
+                $category->deleted = isset($request->deleted);
+                $category->active = isset($request->active);                      
             } catch (CategoryNotFoundException $e) {                       
                 return $e->render();
             }                        
@@ -24,9 +26,7 @@ class CategoryService {
                         
         $category->name = $request->name;
         $category->slug = SlugService::createSlug(Category::class, 'slug', $request->name);
-        $category->description = $request->description;   
-        $category->deleted = isset($request->deleted);
-        $category->active = isset($request->active);        
+        $category->description = $request->description;     
         
         return $category;
     }
@@ -56,7 +56,7 @@ class CategoryService {
     public function getAllCategories() 
     {
     
-        return Category::all();
+        return Category::all()->where('deleted', false)->sortBy('name');
     }
 
     public function storeCategoryInDB (Category $category): bool 
@@ -66,10 +66,18 @@ class CategoryService {
     }
     
     public function updateCategoryInDB (Category $category): bool 
-    {;  
+    {  
         
         return $category->update();        
     }
+    
+    public function deleteCategory(int $id) 
+    {
+        $category = $this->getCategoryById($id);
+        $category->deleted = true;
+        
+        return $category->update();
+    }    
     
     public function getFiltredAndSortedCategories (array $params)
     {
@@ -81,10 +89,10 @@ class CategoryService {
         }
 
         if (array_key_exists('column', $params)) {
-            if (array_key_exists('order', $params) || $parmas['order'] == 'asc') {
+            if (array_key_exists('order', $params) || $params['order'] == 'asc') {
                 $filtredItems = $filtredItems->sortBy($params['column']);
             }
-            if ($parmas['order'] == 'desc') {
+            if ($params['order'] == 'desc') {
                 $filtredItems = $filtredItems->sortByDesc($params['column']);
             }
         } else {

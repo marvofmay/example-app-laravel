@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\CategoryRequest;
+use Illuminate\Http\JsonResponse;
 use App\Services\Category\CategoryService;
 use \App\Helper\pagination\Pagination;
 use App\Helper\request\RequestHelper;
@@ -50,6 +51,7 @@ class CategoryController extends Controller
             [
                 'page' => 'LISTA KATEGORII',
                 'page_list' => 'category_list',
+                'fullPath' => $request->fullUrl(),
                 'str' => $str,
                 'offset' => $pagination->getOffset(),
                 'filtredItems' => $filtredItems,
@@ -124,6 +126,22 @@ class CategoryController extends Controller
         return redirect()->route('category_list');
     }
     
+    /**
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
+    {
+
+        $cs = new CategoryService();
+        $res = $cs->deleteCategory($request->category_id);
+        
+        return response()->json([
+            'success' => 'Kategoria została skasowana.'
+        ]);                    
+    }
+    
     public function generatePDF(int $id) {
         
         $cs = new CategoryService();   
@@ -135,10 +153,10 @@ class CategoryController extends Controller
         }
         
         $data = [
-            'title' => 'Welcome to ItSolutionStuff.com',
+            'title' => 'Przykład pdf\'a kategorii.',
             'category' => $category
         ];
-        //dd($data);
+        
         $pdf = PDF::loadView('category/pdf/pdf', $data);
   
         return $pdf->download('category.pdf');   

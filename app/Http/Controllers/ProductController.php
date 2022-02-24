@@ -12,16 +12,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\Photo;
 use App\Services\Product\ProductService;
 use App\Services\Photo\PhotoService;
 use \App\Helper\pagination\Pagination;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\PhotoRequest;
-use Cviebrock\EloquentSluggable\Services\SlugService;
+use App\Helper\request\RequestHelper;
 use App\Exceptions\ProductNotFoundException;
-use Illuminate\Support\Facades\File;
+use Illuminate\View\View;
 use PDF;
 
 /**
@@ -31,7 +32,14 @@ use PDF;
  */
 class ProductController extends Controller
 {
-    public function list(Request $request, string $str = null)
+    
+    /**
+     * 
+     * @param Request $request
+     * @param string $str
+     * @return View
+     */
+    public function list(Request $request, string $str = null): View
     {
         if (!is_null($str)) {
             $params = RequestHelper::getParamsFromURL($str);
@@ -56,6 +64,7 @@ class ProductController extends Controller
             [
                 'page' => 'LISTA PRODUKTÓW',
                 'page_list' => 'product_list',
+                'fullPath' => $request->fullUrl(),
                 'str' => $str,
                 'offset' => $pagination->getOffset(),
                 'filtredItems' => $filtredItems,
@@ -68,7 +77,12 @@ class ProductController extends Controller
            
     }
 
-    public function display($phrase)
+    /**
+     * 
+     * @param type $phrase
+     * @return View
+     */
+    public function display($phrase): View
     {
         try {
             $product = (new ProductService())->getProductBySlug($phrase);
@@ -84,8 +98,54 @@ class ProductController extends Controller
             ]
         );
     }
+    
+    /**
+     * 
+     * @param Request $request
+     * @param string $slug
+     * @param string $str
+     * @return View
+     */
+    public function productsByCategory(Request$request, string $slug, string $str = null): View
+    {        
+        
+        $category = Category::where(['slug' => $slug])->first();
+        
+        if (!is_null($str)) {
+            $params = RequestHelper::getParamsFromURL($str);
+            $filtredItems = (new ProductService())->getFiltredAndSortedProducts($params, $category);
+        } else {
+            $filtredItems = $category->products;
+        }              
 
-    public function create()
+        $pagination = new Pagination(
+            $filtredItems, 
+            count((new ProductService())->getAllProducts($category)),
+            (isset($params) && array_key_exists('offset', $params)) ? $params['offset'] : 0
+        );  
+        $itemsToDisplayOnPage = $pagination->getItemsToDisplayOnPage();        
+        
+        return view(
+            'Product.list',
+            [
+                'page' => 'LISTA PRODUKTÓW WZGLĘDEM KATEGORII "' . $slug . '"',
+                'fullPath' => $request->fullUrl(),
+                'str' => $str,
+                'offset' => $pagination->getOffset(),
+                'filtredItems' => $filtredItems,
+                'itemsToDisplayOnPage' => $itemsToDisplayOnPage,
+                'foundedItems' => count($filtredItems),
+                'onPage' => $pagination->getItemsOnPage(),
+                'pagination' => $pagination
+            ]
+        );        
+    }
+
+    /**
+     * 
+     * @return View
+     */
+    public function create(): View
     {
         return view(
             'Product.create',
@@ -95,18 +155,24 @@ class ProductController extends Controller
             ]
         );
     }
-
-    public function save(ProductRequest $request)
+    
+    /**
+     * 
+     * @param ProductRequest $request
+     * @return RedirectResponse
+     * @throws \Exception
+     */
+    public function save(ProductRequest $request): RedirectResponse
     {
         DB::beginTransaction();
-        
+
         try {        
            $productService = new ProductService();
            $product = $productService->prepareProductModel($request);
            $productService->storeProductInDB($product);
            
            $photoService = new PhotoService();
-           $photo = $photoService->preparePhotoModel($request, $product);
+           $photo = $photoService->preparePhotoModel($request, $request->file, $product, true);
            $photoService->storePhotoInDB($photo);           
         } catch(\Exception $e) {
            DB::rollback();
@@ -118,10 +184,21 @@ class ProductController extends Controller
         return redirect()->route('product_list');        
     }
 
-    public function edit(int $id)
-    {
-        $product = Product::find($id);
+    /**
+     * 
+     * @param int $id
+     * @return View
+     */
+    public function edit(int $id): View
+    {        
 
+        $ps = new ProductService(); 
+        try {
+            $product= $ps->getProductById($id);
+        } catch (ProductNotFoundException $e) {        
+            return $e->render();
+        }        
+        
         return view(
             'Product.edit',
             [
@@ -132,45 +209,58 @@ class ProductController extends Controller
         );
     }
 
-    public function update(int $id, Request $request)
+    /**
+     * 
+     * @param int $id
+     * @param ProductRequest $request
+     * @return RedirectResponse
+     * @throws \Exception
+     */
+    public function update(int $id, ProductRequest $request): RedirectResponse
     {
-        $product = Product::find($request->id);
-        $product->name = $request->name;
-        $product->slug = SlugService::createSlug(Product::class, 'slug', $request->name);
-        $product->category_id = $request->category_id;
-        $product->description = $request->description;
-        $product->deleted = isset($request->deleted);
-        $product->active = isset($request->active);
-        $product->save();
-
-        $photo = $product->getMainPhoto();
-        if ($request->file()) {
-            $fileName = time() . '_' . $request->file->getClientOriginalName();
-            $filePath = $request->file('file')->storeAs('uploads/product/' . $product->id, $fileName, 'public');
-            $photo->name = time() . '_' . $request->file->getClientOriginalName();
-            $photo->filepath = '/storage/' . $filePath;
-            $photo->main = true;
-            $photo->product()->associate($product);
-            $photo->save();
-            File::link(storage_path('app/public'), public_path('storage'));
-        }
+     
+        DB::beginTransaction();
+        
+        try {        
+           $productService = new ProductService();
+           $product = $productService->prepareProductModel($request);
+           $productService->updateProductInDB($product);
+           
+           $photoService = new PhotoService();
+           $photo = $photoService->preparePhotoModel($request, $product);
+           $photoService->updatePhotoInDB($photo);                 
+        } catch(\Exception $e) {
+           DB::rollback();
+           throw $e;
+        }   
+        
+        DB::commit();
 
         return redirect()->route('product_list');
     }
 
-    public function delete_product(Request $request)
+    /**
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(Request $request): JsonResponse
     {
 
-        //$product = Product::find($request->product_id);
-        //$product->deleted = true;
-        //$product->save();
-
+        $ps = new ProductService();
+        $res = $ps->deleteProduct($request->product_id);
+        
         return response()->json([
-            'success' => 'Deleted record: ' . $request->product_id
-        ]);
+            'success' => 'Produkt został skasowany.'
+        ]);                    
     }
 
-    public function photos($id)
+    /**
+     * 
+     * @param int $id
+     * @return View
+     */
+    public function photos(int $id): View
     {
 
         $product = Product::find($id);
@@ -183,7 +273,12 @@ class ProductController extends Controller
         ]);
     }
 
-    public function addPhotos(int $id)
+    /**
+     * 
+     * @param int $id
+     * @return View
+     */
+    public function addPhotos(int $id): View
     {
         $productService = new ProductService();
         $product = $productService->getProductById($id);
@@ -194,25 +289,32 @@ class ProductController extends Controller
         ]);
     }
 
-    public function savePhotos(PhotoRequest $request)
+    /**
+     * 
+     * @param PhotoRequest $request
+     * @return RedirectResponse
+     */
+    public function savePhotos(PhotoRequest $request): RedirectResponse
     {
                 
         $productService = new ProductService();
         $product = $productService->getProductById($request->post('product_id'));
         
-        if ($request->file() && is_object($product)) {
+        DB::beginTransaction();
+        
+        try {
             foreach ($request->file('file') as $file) {
-                $photo = new Photo();
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = $file->storeAs('uploads/product/' . $product->id, $fileName, 'public');
-                $photo->name = $fileName;
-                $photo->filepath = 'storage/' . $filePath;
-                $photo->product()->associate($product);
-                $photo->save();
-                File::link(storage_path('app/public'), public_path('storage'));
-            }
-        }
-
+                $photoService = new PhotoService();
+                $photo = $photoService->preparePhotoModel($request, $file, $product, false);
+                $photoService->storePhotoInDB($photo);           
+            }                   
+        } catch(\Exception $e) {
+           DB::rollback();
+           throw $e;
+        }   
+        
+        DB::commit();        
+        
         return redirect('/product/' . $request->post('product_id') . '/photos');
     }
 
@@ -227,10 +329,10 @@ class ProductController extends Controller
         }
         
         $data = [
-            'title' => 'Welcome to ItSolutionStuff.com',
+            'title' => 'Przykład pdf\'a produktu.',
             'product' => $product
         ];
-        //dd($data);
+        
         $pdf = PDF::loadView('product/pdf/pdf', $data);
   
         return $pdf->download('product.pdf');   

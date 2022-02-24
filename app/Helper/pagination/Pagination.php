@@ -9,7 +9,7 @@ namespace App\Helper\pagination;
  */
 class Pagination
 {
-    public $itemsOnPage = 10;
+    public $itemsOnPage = 5;
     public $radius = 5;
     public $numberOfAllItems = 0;
     public $qtyFoundedItems = 0;
@@ -17,7 +17,6 @@ class Pagination
     public $numberOfAllButtonsPagination = 0;
     public $startButtons = 1;
     public $endButtons = 0;
-    //public $numberOfAllButtons = 0;
     public $currentButton = 1;
     public $itemsToDisplay = [];
     public $filtredItems = [];

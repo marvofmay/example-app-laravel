@@ -3,16 +3,16 @@
 namespace App\Services\Product;
 
 use App\Models\Product;
-use App\Models\Photo;
+use App\Models\Category;
 use App\Exceptions\ProductNotFoundException;
 use Illuminate\Http\Request;
 use Cviebrock\EloquentSluggable\Services\SlugService;
 
 class ProductService {
     
-    public function getAllProducts() {
+    public function getAllProducts(Category $category = null) {
     
-        return Product::all();
+        return (is_null($category)) ? Product::all()->where('deleted', false) : $category->products;
     }
     
     public function prepareProductModel(Request $request): Product 
@@ -20,32 +20,23 @@ class ProductService {
 
         if (isset($request->id)) {
             try {
-                $product = $this->getProdcutById($request->id);               
+                $product = $this->getProductById($request->id);               
+                $product->deleted = isset($request->deleted);
+                $product->active = isset($request->active);                
             } catch (ProductNotFoundException $e) {                       
                 return $e->render();
             }                        
         } else {
-            $product = new Product(); 
+            $product = new Product();             
         }    
         
-        $product = new Product();
         $product->name = $request->name;
         $product->category_id = $request->category_id;
         $product->slug = SlugService::createSlug(Product::class, 'slug', $request->name);
         $product->description = $request->description;
         
         return $product;    
-    }   
-    
-    public function preparePhotoModel (Request $request): Photo 
-    {
-        
-        if ($request->file()) {
-
-        }            
-        
-        return $photo;
-    }
+    }       
     
     public function storeProductInDB (Product $product): bool 
     {
@@ -53,6 +44,21 @@ class ProductService {
         return $product->save(); 
     }    
     
+    public function updateProductInDB (Product $product): bool 
+    {  
+        
+        return $product->update();        
+    }    
+    
+    public function deleteProduct(int $id) 
+    {
+        $product = $this->getProductById($id);
+        $product->deleted = true;
+        
+        return $product->update();
+    }
+
+
     public function getProductBySlug (string $slug)
     {
         
@@ -75,12 +81,20 @@ class ProductService {
         return $product;        
     }    
     
-    public function getFiltredAndSortedProducts (array $params) {
+    public function getFiltredAndSortedProducts (array $params, Category $category = null) {
         
         if (array_key_exists('phrase', $params)) {
-            $filtredItems = Product::where('name', 'LIKE', '%' . $params['phrase'] . '%')->get();
+            $filtredItems = Product::where('name', 'LIKE', '%' . $params['phrase'] . '%');
+            if (!is_null($category)) {
+                $filtredItems = $filtredItems->where('category_id', $category->id);
+            }
+            $filtredItems = $filtredItems->get();
         } else {
-            $filtredItems = $this->getAllProducts();
+            if (is_null($category)) {
+                $filtredItems = $this->getAllProducts();
+            } else {
+                $filtredItems = $this->getAllProducts($category);
+            }    
         }
 
         if (array_key_exists('column', $params)) {
@@ -95,5 +109,6 @@ class ProductService {
         }
                 
         return $filtredItems;
-    }    
+    }         
+    
 }

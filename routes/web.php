@@ -43,12 +43,13 @@ Route::get('/test/queue', [TestController::class, 'queue'])->name('test_queue');
 Route::get('/test/elastic', [TestController::class, 'elastic'])->name('test_elastic');
 
 Route::get('/products/{phrase?}', [ProductController::class, 'list'])->name('product_list');
+Route::get('/products/category/{slug}/{phrase?}', [ProductController::class, 'productsByCategory'])->name('products_by_category');
 Route::get('/product/show/{phrase}', [ProductController::class, 'display'])->name('product_display');
 Route::get('/product/create', [ProductController::class, 'create'])->name('create_product');
 Route::post('/product/save', [ProductController::class, 'save'])->name('save_product');
 Route::get('/product/edit/{id}', [ProductController::class, 'edit'])->name('edit_product');
 Route::put('/product/update/{id}', [ProductController::class, 'update'])->name('update_product');
-Route::delete('/product/delete_product', [ProductController::class, 'delete_product'])->name('delete_product');
+Route::delete('/product/delete', [ProductController::class, 'delete'])->name('delete_product');
 Route::get('/product/{id}/photos', [ProductController::class, 'photos'])->name('product_photos');
 Route::get('/product/{id}/photos/add', [ProductController::class, 'addPhotos'])->name('product_add_photos');
 Route::post('/product/photos/save', [ProductController::class, 'savePhotos'])->name('save_product_photos');
@@ -58,6 +59,7 @@ Route::get('/categories/{phrase?}', [CategoryController::class, 'list'])->name('
 Route::get('/category/show/{phrase}', [CategoryController::class, 'display'])->name('category_display');
 Route::get('/category/create', [CategoryController::class, 'create'])->name('create_category');
 Route::post('/category/save', [CategoryController::class, 'save'])->name('save_category');
+Route::delete('/category/delete', [CategoryController::class, 'delete'])->name('delete_category');
 Route::get('/category/edit/{id}', [CategoryController::class, 'edit'])->name('edit_category');
 Route::put('/category/update/{id}', [CategoryController::class, 'update'])->name('update_category');
 Route::get('/category/pdf/{id}', [CategoryController::class, 'generatePDF'])->name('pdf_category');
@@ -87,18 +89,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
             Route::get('/{user}/edit', 'UsersController@edit')->name('users.edit');
             Route::patch('/{user}/update', 'UsersController@update')->name('users.update');
             Route::delete('/{user}/delete', 'UsersController@destroy')->name('users.destroy');
-        });
-        /**
-         * User Routes
-         */
-        Route::group(['prefix' => 'posts'], function () {
-            Route::get('/', 'PostsController@index')->name('posts.index');
-            Route::get('/create', 'PostsController@create')->name('posts.create');
-            Route::post('/create', 'PostsController@store')->name('posts.store');
-            Route::get('/{post}/show', 'PostsController@show')->name('posts.show');
-            Route::get('/{post}/edit', 'PostsController@edit')->name('posts.edit');
-            Route::patch('/{post}/update', 'PostsController@update')->name('posts.update');
-            Route::delete('/{post}/delete', 'PostsController@destroy')->name('posts.destroy');
         });
 
         /**

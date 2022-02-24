@@ -12,7 +12,7 @@
                             $url = $str . '&offset=' . (($i - 1) * $pagination->itemsOnPage);
                         }                        
                     } else {
-                        $url = 'offset=' . (($i - 1) * $pagination->itemsOnPage);
+                        $url = $fullPath . '/offset=' . (($i - 1) * $pagination->itemsOnPage);
                     }
                     if ($i == $pagination->currentButton) { 
                         $class = 'btn-success';
@@ -20,18 +20,18 @@
                         $class = 'btn-primary';
                     }    
                 @endphp                
-                <a href="{{ route($page_list, [$url]) }}" class="btn {{ $class }}">{{ $i }}</a>
+                <a href="{{ $url }}" class="btn {{ $class }}">{{ $i }}</a>
             @endfor  
 
             @if ($pagination->endButtons < $pagination->numberOfAllButtonsPagination)
                 @if ($str == '') 
-                    ... <a href="{{ route($page_list, ['offset=' . ($pagination->numberOfAllButtonsPagination - 1) * $pagination->itemsOnPage]) }}" class="btn btn-primary">{{$pagination->numberOfAllButtonsPagination}}</a>
+                    ... <a href="{{ route($page_list, ['offset=' . ($pagination->numberOfAllButtonsPagination - 1) * $pagination->itemsOnPage]) }}" class="btn btn-primary">{{$pagination->numberOfAllButtonsPagination}}</a>             
                 @else
                     ... <a href="{{ route($page_list, [preg_replace('/offset=\d+/', 'offset=' . ($pagination->numberOfAllButtonsPagination - 1) * $pagination->itemsOnPage, $str)]) }}" class="btn btn-primary">{{$pagination->numberOfAllButtonsPagination}}</a>
                 @endif
             @endif        
 </div>
-
+<!--
             <br />
             radius: {{ $pagination->radius }}
             <br />
@@ -48,3 +48,4 @@
             endButtons: {{ $pagination->endButtons }}        
             <br />
             numberOfAllButtonsPagination: {{ $pagination->numberOfAllButtonsPagination }}           
+-->          

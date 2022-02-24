@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ProductRequest extends FormRequest
 {
+    
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -22,13 +23,22 @@ class ProductRequest extends FormRequest
      * @return array
      */
     public function rules()
-    {
-        return [
-            'file' => 'required|mimes:png,jpeg,jpg|max:4096',
-            'name' => 'required',
-            'description' => 'required',
-            'category_id' => 'required'
-        ];
+    {        
+        if ($this->method() === 'POST') {
+            return [
+                'file' => 'required|mimes:png,jpeg,jpg|max:4096',
+                'name' => 'required',
+                'description' => 'required',
+                'category_id' => 'required'
+            ];            
+        }
+        if ($this->method() === 'PUT') {
+            return [
+                'name' => 'required',
+                'description' => 'required',
+                'category_id' => 'required'
+            ];            
+        }        
     }
     
     /**
@@ -39,7 +49,7 @@ class ProductRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => __('Pole "email" jest wymagane.'),
+            'name.required' => __('Pole "name" jest wymagane.'),
             'description.required' => __('Pole "opis" jest wymagane.'),
             'category_id.required' => __('Pole "kategoria" jest wymagane.'),
             'file.required' => __('Wskaż plik.'),

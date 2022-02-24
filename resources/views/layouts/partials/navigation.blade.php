@@ -13,10 +13,10 @@
             <a class="nav-link active" href="{{ route('home_index') }}">home</a>        
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('category_list') }}">lista kategorii ({{count(\App\Models\Category::all())}})</a>        
+            <a class="nav-link" href="{{ route('category_list') }}">lista kategorii ({{count(\App\Models\Category::all()->where('deleted', false))}})</a>        
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('product_list') }}">lista produktów ({{count(\App\Models\Product::all())}})</a>        
+            <a class="nav-link" href="{{ route('product_list') }}">lista produktów ({{count(\App\Models\Product::all()->where('deleted', false))}})</a>        
         </li>
         @guest
         <li class="nav-item">
@@ -27,23 +27,9 @@
             @role('admin')
             <li class="nav-item"><a href="{{ route('users.index') }}" class="nav-link">użytkownicy</a></li>
             <li class="nav-item"><a href="{{ route('roles.index') }}" class="nav-link">role</a></li>
-            <li class="nav-item"><a href="{{ route('contact_list') }}" class="nav-link">wiadomości</a></li>
             @endrole
           <li><a href="{{ route('posts.index') }}" class="nav-link px-2 text-white">Posts</a></li>
         @endauth        
-        <!--
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        -->
       </ul>
       <form class="d-flex">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">

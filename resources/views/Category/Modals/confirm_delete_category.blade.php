@@ -1,17 +1,18 @@
-<div class="modal" id="modal-confirm-delete-category" tabindex="-1">
+<!-- Modal -->
+<div class="modal fade" id="modal-confirm-delete-category" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modal-confirm-delete-category-title"></h5>
+        <h5 class="modal-title" id="modal-confirm-title-category">Formaularz potwierdzenia usunięcia kategorii</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body" id="modal-confirm-delete-category-body">
-        <p></p>
+      <div class="modal-body" id="modal-confirm-body-category">       
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
-        <button type="button" class="btn btn-danger" id="btn-delete-category">Usuń</button>
+          <span id="modal-info-body-category" class="text-success"></span>
+        <button type="button" class="btn btn-secondary" id="btn-cancel-delete-category" data-bs-dismiss="modal">Anuluj</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete-category">Usuń</button>
       </div>
     </div>
   </div>
-</div> 
+</div>
