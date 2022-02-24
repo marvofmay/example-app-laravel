@@ -32,6 +32,7 @@
                                 <td>
                                 <a class="btn btn-warning" href="{{ route('edit_category', ['id' => $item->id]) }}">edytuj</a>
                                 <button 
+                                    id="btn-delete-category-{{$item->id}}"
                                     class="btn btn-danger delete btn-delete-category" 
                                     data-category-id="{{$item->id}}" 
                                     data-category-name="{{$item->name}}"

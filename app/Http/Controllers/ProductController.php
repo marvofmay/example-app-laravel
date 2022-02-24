@@ -46,11 +46,7 @@ class ProductController extends Controller
             $filtredItems = (new ProductService())->getFiltredAndSortedProducts($params);
         } else {
             $filtredItems = (new ProductService())->getAllProducts();
-        }        
-        
-        if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
-            return $filtredItems;
-        }                
+        }                     
         
         $pagination = new Pagination(
             $filtredItems, 

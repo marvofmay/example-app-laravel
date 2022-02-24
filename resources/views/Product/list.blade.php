@@ -36,6 +36,7 @@
                                 <td>
                                     <a class="btn btn-warning" href="{{ route('edit_product', ['id' => $item->id]) }}">edytuj</a>                
                                     <button 
+                                        id="btn-delete-product-{{$item->id}}"
                                         class="btn btn-danger delete btn-delete-product" 
                                         data-product-id="{{$item->id}}"
                                         data-product-name="{{$item->name}}"

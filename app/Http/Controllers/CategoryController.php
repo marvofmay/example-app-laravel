@@ -33,11 +33,7 @@ class CategoryController extends Controller
             $filtredItems = (new CategoryService())->getFiltredAndSortedCategories($params);
         } else {
             $filtredItems = (new CategoryService())->getAllCategories();
-        }        
-        
-        if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
-            return $filtredItems;
-        }                
+        }                    
         
         $pagination = new Pagination(
             $filtredItems, 

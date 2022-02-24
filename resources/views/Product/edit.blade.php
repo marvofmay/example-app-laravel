@@ -53,7 +53,7 @@
                 </div>                  
                 
                 <div class="row form-group">
-                    <label for="name" class="col-sm-4 col-form-label">opis:</label>
+                    <label for="description" class="col-sm-4 col-form-label">opis:</label>
                     <div class="col-sm-8">
                         <textarea id="description" class="form-control" name="description" >{{ $product->description }}</textarea>                
                         <span></span>

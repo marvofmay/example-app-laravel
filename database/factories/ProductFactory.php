@@ -29,8 +29,8 @@ class ProductFactory extends Factory
             'description' => 'product description for ' . $name,
             'slug' => Str::slug($name),
             'category_id' => \App\Models\Category::factory()->create(),
-            'active' =>  rand(0, 1),
-            'deleted' => rand(0, 1)
+            'active' =>  1,
+            'deleted' => 0
         ];
     }
 }

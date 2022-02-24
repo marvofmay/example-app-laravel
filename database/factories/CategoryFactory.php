@@ -28,8 +28,8 @@ class CategoryFactory extends Factory
             'name' => 'category ' . $name,
             'description' => 'category description for ' . $name,
             'slug' => Str::slug($name),
-            'active' =>  rand(0, 1),
-            'deleted' => rand(0, 1)
+            'active' =>  1,
+            'deleted' => 0
         ];
     }
 }
