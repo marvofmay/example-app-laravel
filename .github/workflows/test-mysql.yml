@@ -112,4 +112,9 @@ jobs:
         run: php artisan cache:clear                       
         
       - name: Run feature tests via Laravel
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: laravel
+          DB_PORT: 33306
+          DB_USER: root      
         run: php artisan test --filter=Feature
