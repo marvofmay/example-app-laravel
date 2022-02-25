@@ -76,7 +76,7 @@ jobs:
         run: php artisan config:clear --env=testing   
 
       - name: Generate key
-        run: php artisan key:generate
+        run: php artisan key:generate --env=testing  
       - name: Config clear
         run: php artisan config:clear       
       - name: Directory Permissions
