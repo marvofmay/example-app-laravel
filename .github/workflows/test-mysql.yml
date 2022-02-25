@@ -99,12 +99,22 @@ jobs:
           DB_PORT: 33306
           DB_USER: root
 
-        run: php artisan migrate         
+        run: php artisan migrate --force -v        
         
       - name: Run config clear   
         run: php artisan config:clear                                  
         
+      - name: Run cache clear   
+        run: php artisan cache:clear
+                
       - name: Execute tests VIA Laravel
+        # Set environment
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: laravel
+          DB_PORT: 33306
+          DB_USER: root
+          
         run: php artisan test
 
 
