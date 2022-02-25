@@ -14,7 +14,7 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE:  laravel
+          MYSQL_DATABASE:  laravel_testing
         ## map the "external" 33306 port with the "internal" 3306
         ports:
           - 33306:3306
@@ -56,8 +56,8 @@ jobs:
         with:
           path: vendor
           key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
-      - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Copy .env.testing
+        run: php -r "file_exists('.env.testing');"
       - name: Install Dependencies
         if: steps.vendor-cache.outputs.cache-hit != 'true'
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
@@ -76,12 +76,12 @@ jobs:
       - name: Run Migrations
         # Set environment
         env:
-          DB_CONNECTION: mysql
-          DB_DATABASE: laravel
+          DB_CONNECTION: mysql_testing
+          DB_DATABASE: laravel_testing
           DB_PORT: 33306
           DB_USER: root
 
-        run: php artisan migrate:install
+        run: php artisan migrate
 
       - name: Show Laravel versions
         run: php artisan --version
@@ -93,8 +93,8 @@ jobs:
       - name: Execute tests VIA Laravel
         # Set environment
         env:
-          DB_CONNECTION: mysql
-          DB_DATABASE: laravel
+          DB_CONNECTION: mysql_testing
+          DB_DATABASE: laravel_testing
           DB_PORT: 33306
           DB_USER: root
 
