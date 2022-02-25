@@ -24,10 +24,9 @@ class PhotoFactory extends Factory
     {
         $product = \App\Models\Product::factory()->create();
         if (Storage::makeDirectory('public/uploads/tests/product/' . $product->id)) {
-            if (!is_dir('./storage/app/public/uploads/tests/product/' . $product->id)) {
-                dd('ff');
+            if (is_dir('./storage/app/public/uploads/tests/product/' . $product->id)) {
+                $fileName = $this->faker->image('./storage/app/public/uploads/tests/product/' . $product->id, 50, 50, null, false);
             }
-            $fileName = $this->faker->image('./storage/app/public/uploads/tests/product/' . $product->id, 50, 50, null, false);
         }
 
         return [

@@ -49,9 +49,9 @@ class ProductController extends Controller
         if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {            
             $ps = new ProductService(); 
             if (is_null($id)) {            
-                return response()->json([$ps->getAllProducts()]);
+                return response()->json($ps->getAllProducts());
             } else {
-                return response()->json([($ps->getProductById($id))]);
+                return response()->json($ps->getProductById($id));
             }
         }                
     }
