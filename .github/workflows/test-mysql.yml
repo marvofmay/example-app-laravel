@@ -103,21 +103,18 @@ jobs:
         
       - name: Run config clear   
         run: php artisan config:clear        
-        
-      - name: Run Laravel
-        run: php artisan serve
-        
-      - name: Run cache clear   
-        run: php artisan cache:clear
                 
-      - name: Execute tests (Unit and Feature tests) via PHPUnit
+      - name: Run cache clear   
+        run: php artisan cache:clear                
+                
+      - name: Execute Feature tests via PHPUnit
         env:
           DB_CONNECTION: mysql
           DB_DATABASE: laravel
           DB_PORT: 3306
           DB_USERNAME: root
           
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --filter Feature
 
 
 
