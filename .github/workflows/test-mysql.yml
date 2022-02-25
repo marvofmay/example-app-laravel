@@ -56,8 +56,13 @@ jobs:
         with:
           path: vendor
           key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
+        
+      - name: Copy .env
+        run: php -r "file_exists('.env');"
+          
       - name: Copy .env.testing
         run: php -r "file_exists('.env.testing');"
+        
       - name: Install Dependencies
         if: steps.vendor-cache.outputs.cache-hit != 'true'
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
@@ -66,6 +71,9 @@ jobs:
         run: npm install
       - name: Compile assets
         run: npm run prod
+
+      - name: Run Laravel in .env.testing
+        run: php artisan config:clear --env=testing   
 
       - name: Generate key
         run: php artisan key:generate
