@@ -99,7 +99,7 @@ jobs:
           DB_PORT: 33306
           DB_USER: root
 
-        run: php artisan migrate --fresh       
+        run: php artisan migrate     
         
       - name: Run config clear   
         run: php artisan config:clear        
