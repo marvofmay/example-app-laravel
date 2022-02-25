@@ -100,7 +100,7 @@ jobs:
         env:
           DB_CONNECTION: mysql
           DB_DATABASE: laravel
-          DB_PORT: 33306
+          DB_PORT: 3306
           DB_USER: root
 
         run: php artisan migrate     
@@ -115,6 +115,6 @@ jobs:
         env:
           DB_CONNECTION: mysql
           DB_DATABASE: laravel
-          DB_PORT: 33306
+          DB_PORT: 3306
           DB_USER: root      
         run: php artisan test --filter=Feature
