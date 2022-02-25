@@ -69,18 +69,25 @@ jobs:
 
       - name: Install NPM dependencies
         run: npm install
+        
       - name: Compile assets
         run: npm run prod
 
-      - name: Run Laravel in .env.testing
-        run: php artisan config:clear --env=testing   
-
       - name: Generate key
         run: php artisan key:generate --env=testing  
+        
       - name: Config clear
         run: php artisan config:clear       
+        
+      - name: Run Laravel in .env.testing
+        run: php artisan config:clear --env=testing           
+        
       - name: Directory Permissions
         run: chmod -R 777 storage bootstrap/cache
+        
+      - name: Run Laravel in .env.testing
+        run: php artisan config:clear --env=testing             
+        
       - name: Run Migrations
         # Set environment
         env:
@@ -106,7 +113,7 @@ jobs:
           DB_PORT: 33306
           DB_USER: root
 
-        run: php artisan test
+        run: php artisan test --env=testing
 
 
 
