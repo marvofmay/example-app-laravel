@@ -109,20 +109,4 @@ jobs:
         run: php artisan cache:clear                
         
       - name: Run config cache  testing 
-        run: php artisan config:cache --env=force
-                
-      - name: Execute tests via Laravel
-        env:
-          DB_CONNECTION: mysql_testing
-          DB_HOST: 127.0.0.1
-          DB_DATABASE: laravel_testing
-          DB_PORT: 3306
-          DB_USERNAME: root
-          DB_PASSWORD:
-          
-        run: php artisan test --env=testing
-
-
-
-
-
+        run: php artisan config:cache --env=force                
