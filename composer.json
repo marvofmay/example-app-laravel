@@ -8,6 +8,7 @@
         "php": "^7.3|^8.0",
         "barryvdh/laravel-dompdf": "^0.9.0",
         "cviebrock/eloquent-sluggable": "^8.0",
+        "darkaonline/l5-swagger": "^8.3",
         "elasticquent/elasticquent": "^1.0",
         "elasticsearch/elasticsearch": "~6.1",
         "friendsofphp/php-cs-fixer": "^3.4",

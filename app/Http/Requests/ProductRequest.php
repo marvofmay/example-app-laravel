@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @OA\Schema()
+ */
 class ProductRequest extends FormRequest
 {
     
@@ -18,9 +21,10 @@ class ProductRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
+     * @OA\Property(format="string", default="lorem ipsum dolor", description="product name", property="name"),
+     * @OA\Property(format="string", default="description of lorem ipsum dolor", description="product description", property="description"),
+     * @OA\Property(format="integer", default="1", description="category of product", property="category_id"),
+     * @OA\Property(type="file", description="main photo of product", property="file"),
      */
     public function rules()
     {        

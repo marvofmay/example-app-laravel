@@ -24,6 +24,26 @@ use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
 {
     
+   /**
+    * @OA\Get(
+    *    path="/api/products",
+    *    @OA\Parameter(        
+    *        description="ID of product",
+    *        in="path",
+    *        name="id",
+    *        required=false,
+    *        example=3,
+    *        @OA\Schema(
+    *            type="integer",
+    *            nullable=true
+    *       )
+    *    ),
+    *    summary="Get list of products or one product by ID of product",
+    *    description="Get products or product by ID",
+    *    tags={"products"},
+    *    @OA\Response(response="200", description="get products or product")
+    * )
+    */    
     public function products(Request $request, int $id = null): JsonResponse
     {                                 
         if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {            
@@ -36,6 +56,35 @@ class ProductController extends Controller
         }                
     }
   
+   /**
+    * @OA\Delete(
+    *    path="/api/products/{id}",
+    *    @OA\Parameter(
+    *        description="ID of product",
+    *        in="path",
+    *        name="id",
+    *        required=true,
+    *        example=3,
+    *        @OA\Schema(type="integer")
+    *    ),
+    *    summary="Delete product by ID of product",    
+    *    description="Delete product by ID",
+    *    tags={"products"},
+    *    security={ {"sanctum": {}} },
+    *    @OA\Response(
+    *        response="200", description="Delete product and get response message - true / false",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="success", type="boolean", example="true")
+    *        )
+    *    ),
+    *    @OA\Response(
+    *        response="401", description="User is unauthenticated",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="message", type="string", example="Unauthenticated")
+    *        )
+    *    )
+    * )
+    */        
     public function delete(Request $request, int $id): JsonResponse
     {                                       
         if (($request->wantsJson() && $request->isMethod('DELETE')) || preg_match('/^api\//', $request->path())) {            
@@ -47,6 +96,36 @@ class ProductController extends Controller
         }                
     }   
     
+   /**
+    * @OA\POST(
+    *    path="/api/products/",
+    *    summary="Create new product",
+    *    description="Create new product",
+    *    tags={"products"},
+    *    security={ {"sanctum": {}} },
+    *    @OA\RequestBody(
+    *        @OA\MediaType(
+    *            mediaType="multipart/form-data",
+    *            @OA\Schema(
+    *                type="object",
+    *                ref="#/components/schemas/ProductRequest",
+    *            )
+    *        )
+    *    ),    
+    *    @OA\Response(
+    *        response="200", description="response message - true / false",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="success", type="boolean", example="true")
+    *        )
+    *    ),
+    *    @OA\Response(
+    *        response="401", description="User is unauthenticated",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="message", type="string", example="Unauthenticated")
+    *        )
+    *    )
+    * )
+    */      
     public function create(ProductRequest $request): JsonResponse
     {                                       
         if (($request->wantsJson() && $request->isMethod('POST')) || preg_match('/^api\//', $request->path())) {            
