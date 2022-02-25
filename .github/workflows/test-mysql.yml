@@ -96,7 +96,7 @@ jobs:
           DB_PORT: 33306
           DB_USER: root
 
-        run: php artisan migrate
+        run: php artisan --env=testing migrate
 
       - name: Show Laravel versions
         run: php artisan --version
