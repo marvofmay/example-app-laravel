@@ -14,7 +14,7 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE:  laravel_testing
+          MYSQL_DATABASE:  laravel
         ## map the "external" 33306 port with the "internal" 3306
         ports:
           - 33306:3306
