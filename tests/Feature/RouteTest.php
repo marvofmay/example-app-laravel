@@ -6,7 +6,7 @@ use Tests\TestCase;
 
 class RouteTest extends TestCase
 {
-
+    
     public function test_route_home()
     {
         $response = $this->get('/');
