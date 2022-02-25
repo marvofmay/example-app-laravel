@@ -62,7 +62,10 @@ jobs:
           key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
         
       - name: Copy .env
-        run: php -r "copy('.env.testing', '.env');"          
+        run: php -r "file_exists('.env') || copy('.env.testing', '.env');"   
+        
+      - name: Copy .env.testing
+        run: php -r "file_exists('.env.testing');"           
         
       - name: Install Dependencies
         if: steps.vendor-cache.outputs.cache-hit != 'true'
