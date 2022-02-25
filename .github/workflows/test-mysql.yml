@@ -102,7 +102,10 @@ jobs:
         run: php artisan migrate --force -v        
         
       - name: Run config clear   
-        run: php artisan config:clear                                  
+        run: php artisan config:clear        
+        
+      - name: Run Laravel
+        run: php artisan serve
         
       - name: Run cache clear   
         run: php artisan cache:clear
