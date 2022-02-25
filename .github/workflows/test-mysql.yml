@@ -101,11 +101,11 @@ jobs:
 
         run: php artisan migrate         
         
-      - name: Run Laravel in .env.testing
-        run: php artisan config:clear --env=testing                                          
+      - name: Run config clear   
+        run: php artisan config:clear                                  
         
       - name: Execute tests VIA Laravel
-        run: php artisan test --env=testing
+        run: php artisan test
 
 
 
