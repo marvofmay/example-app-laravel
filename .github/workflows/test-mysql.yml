@@ -110,3 +110,6 @@ jobs:
                 
       - name: Run cache clear   
         run: php artisan cache:clear                       
+        
+      - name: Run feature tests via Laravel
+        run: php artisan test --filter=Feature
