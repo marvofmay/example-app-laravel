@@ -62,10 +62,7 @@ jobs:
           key: ${{ runner.OS }}-build-${{ hashFiles('**/composer.lock') }}
         
       - name: Copy .env
-        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-          
-      - name: Copy .env.testing
-        run: php -r "file_exists('.env.testing') || copy('.env.example', '.env.testing');"
+        run: php -r "copy('.env.testing', '.env');"          
         
       - name: Install Dependencies
         if: steps.vendor-cache.outputs.cache-hit != 'true'
@@ -117,10 +114,11 @@ jobs:
       - name: Execute tests via Laravel
         env:
           DB_CONNECTION: mysql_testing
-          DB_HOST: mysql
+          DB_HOST: 127.0.0.1
           DB_DATABASE: laravel_testing
           DB_PORT: 3306
           DB_USERNAME: root
+          DB_PASSWORD:
           
         run: php artisan test --env=testing
 
