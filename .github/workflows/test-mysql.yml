@@ -110,6 +110,7 @@ jobs:
       - name: Execute Feature tests via PHPUnit
         env:
           DB_CONNECTION: mysql
+          DB_HOST: localhost
           DB_DATABASE: laravel
           DB_PORT: 3306
           DB_USERNAME: root
