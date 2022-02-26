@@ -21,8 +21,8 @@ class ProductService {
         if (isset($request->id)) {
             try {
                 $product = $this->getProductById($request->id);               
-                $product->deleted = isset($request->deleted);
-                $product->active = isset($request->active);                
+                $product->deleted = isset($request->deleted) && $request->deleted !== 'false';
+                $product->active = isset($request->active) && $request->active !== 'false';                
             } catch (ProductNotFoundException $e) {                       
                 return $e->render();
             }                        

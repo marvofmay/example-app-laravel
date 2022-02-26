@@ -25,9 +25,13 @@ Route::get('/products/{id?}', [ProductController::class, 'products'])->name('api
 //Route::get('/users', [UsersController::class, 'index'])->name('api_user_list');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('/logout', [LogoutController::class, 'perform'])->name('api_logout');
+    Route::get('/logout', [LogoutController::class, 'perform'])->name('api_logout');    
+    
+    Route::post('/categories', [CategoryController::class, 'create'])->name('api_category_create');
+    Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('api_category_update');
     Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('api_category_delete'); 
-    Route::post('/categories', [CategoryController::class, 'create'])->name('api_category_create'); 
-    Route::delete('/products/{id}', [ProductController::class, 'delete'])->name('api_product_delete');
+    
     Route::post('/products', [ProductController::class, 'create'])->name('api_product_create'); 
+    Route::put('/products/{id}', [ProductController::class, 'update'])->name('api_product_update'); 
+    Route::delete('/products/{id}', [ProductController::class, 'delete'])->name('api_product_delete');
 });

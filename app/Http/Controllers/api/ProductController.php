@@ -8,6 +8,7 @@ use App\Services\Photo\PhotoService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -15,12 +16,13 @@ class ProductController extends Controller
     
    /**
     * @OA\Get(
-    *    path="/api/products",
+    *    path="/api/products/{id}",
     *    @OA\Parameter(        
     *        description="ID of product",
     *        in="path",
     *        name="id",
     *        required=false,
+    *        allowEmptyValue=true,
     *        example=3,
     *        @OA\Schema(
     *            type="integer",
@@ -138,5 +140,72 @@ class ProductController extends Controller
         
         return response()->json(['success' => false]);
     }     
+    
+   /**
+    * @OA\PUT(
+    *    path="/api/products/{id}",
+    *    summary="Update product by ID of product",
+    *    description="Update product by ID of product",
+    *    tags={"products"},
+    *    security={ {"sanctum": {}} },
+    *    @OA\Parameter(
+    *        description="ID of product",
+    *        in="path",
+    *        name="id",
+    *        required=true,
+    *        example=3,
+    *        @OA\Schema(type="integer")
+    *    ),    
+    *    @OA\RequestBody(
+    *        @OA\MediaType(
+    *            mediaType="application/x-www-form-urlencoded",
+    *            @OA\Schema(
+    *                type="object",
+    *                ref="#/components/schemas/ProductUpdateRequest",
+    *            )
+    *        )
+    *    ),     
+    *    @OA\Response(
+    *        response="200", description="response message - true / false",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="success", type="boolean", example="true")
+    *        )
+    *    ),
+    *    @OA\Response(
+    *        response="401", description="User is unauthenticated",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="message", type="string", example="Unauthenticated")
+    *        )
+    *    )
+    * )
+    */      
+    public function update(ProductUpdateRequest $request): JsonResponse
+    {                       
+ 
+        if (($request->wantsJson() && $request->isMethod('PUT')) || preg_match('/^api\//', $request->path())) {         
+
+            DB::beginTransaction();
+        
+            try {        
+               $productService = new ProductService();
+               $product = $productService->prepareProductModel($request);
+               $productService->updateProductInDB($product);
+               if (!is_null($request->file('file'))) {
+                   $photoService = new PhotoService();
+                   $photo = $photoService->preparePhotoModel($request, $request->file('file'), $product, true);
+                   $photoService->updatePhotoInDB($photo);                 
+               }
+            } catch(\Exception $e) {
+               DB::rollback();
+               throw $e;
+            }   
+
+            DB::commit();            
+            
+            return response()->json(['success' => true]);
+        }   
+        
+        return response()->json(['success' => false]);
+    }      
     
 }

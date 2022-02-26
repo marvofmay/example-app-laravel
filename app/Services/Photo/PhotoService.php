@@ -35,13 +35,13 @@ class PhotoService {
         $photo->filepath = 'storage/' . $filePath;     
         File::link(storage_path('app/public'), public_path('storage'));
         
-        if ($isMainPhoto) {
-            $photo->main = true;
-        }
-        
         if (!is_null($product)) {            
             $photo->product()->associate($product);     
         } 
+                
+        if ($isMainPhoto) {
+            $photo->main = true;
+        }        
       
         return $photo;
     }

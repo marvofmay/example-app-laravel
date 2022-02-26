@@ -218,16 +218,18 @@ class ProductController extends Controller
         DB::beginTransaction();
         
         try {        
-           $productService = new ProductService();
-           $product = $productService->prepareProductModel($request);
-           $productService->updateProductInDB($product);
+            $productService = new ProductService();
+            $product = $productService->prepareProductModel($request);
+            $productService->updateProductInDB($product);
            
-           $photoService = new PhotoService();
-           $photo = $photoService->preparePhotoModel($request, $product);
-           $photoService->updatePhotoInDB($photo);                 
+            if (!is_null($request->file('file'))) {
+                $photoService = new PhotoService();
+                $photo = $photoService->preparePhotoModel($request, $request->file('file'), $product, true);
+                $photoService->updatePhotoInDB($photo);
+            }
         } catch(\Exception $e) {
-           DB::rollback();
-           throw $e;
+            DB::rollback();
+            throw $e;
         }   
         
         DB::commit();

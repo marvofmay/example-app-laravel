@@ -15,8 +15,8 @@ class CategoryService {
         if (isset($request->id)) {
             try {
                 $category = $this->getCategoryById($request->id);               
-                $category->deleted = isset($request->deleted);
-                $category->active = isset($request->active);                      
+                $category->deleted = isset($request->deleted) && $request->deleted !== 'false';
+                $category->active = isset($request->active) && $request->active !== 'false';                      
             } catch (CategoryNotFoundException $e) {                       
                 return $e->render();
             }                        

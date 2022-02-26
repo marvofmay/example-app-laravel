@@ -7,18 +7,20 @@ use Illuminate\Http\Request;
 use App\Services\Category\CategoryService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\CategoryUpdateRequest;
 
 class CategoryController extends Controller
 {
     
    /**
     * @OA\Get(
-    *    path="/api/categories",
+    *    path="/api/categories/{id}",
     *    @OA\Parameter(
     *        description="ID of category",
     *        in="path",
     *        name="id",
     *        required=false,
+    *        allowEmptyValue=true,
     *        example=3,
     *        @OA\Schema(
     *            type="integer",
@@ -127,6 +129,56 @@ class CategoryController extends Controller
         }   
         
         return response()->json(['success' => false]);
-    }     
+    }      
+    
+   /**
+    * @OA\PUT(
+    *    path="/api/categories/{id}",
+    *    summary="Update category by ID of category",
+    *    description="Update category by ID of category",
+    *    tags={"categories"},
+    *    security={ {"sanctum": {}} },
+    *    @OA\Parameter(
+    *        description="ID of category",
+    *        in="path",
+    *        name="id",
+    *        required=true,
+    *        example=3,
+    *        @OA\Schema(type="integer")
+    *    ),   
+    *    @OA\RequestBody(
+    *        @OA\MediaType(
+    *            mediaType="application/x-www-form-urlencoded",
+    *            @OA\Schema(
+    *                type="object",
+    *                ref="#/components/schemas/CategoryUpdateRequest",
+    *            )
+    *        )
+    *    ),    
+    *    @OA\Response(
+    *        response="200", description="response message - true / false",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="success", type="boolean", example="true")
+    *        )
+    *    ),
+    *    @OA\Response(
+    *        response="401", description="User is unauthenticated",
+    *        @OA\JsonContent(
+    *            @OA\Property(property="message", type="string", example="Unauthenticated")
+    *        )
+    *    )
+    * )
+    */      
+    public function update(CategoryUpdateRequest $request): JsonResponse
+    {                                       
+        if (($request->wantsJson() && $request->isMethod('PUT')) || preg_match('/^api\//', $request->path())) {         
+            $cs = new CategoryService(); 
+            $category = $cs->prepareCategoryModel($request);            
+            
+            return response()->json(['success' => $cs->updateCategoryInDB($category)]);
+        }   
+        
+        return response()->json(['success' => false]);
+    }             
 
 }
