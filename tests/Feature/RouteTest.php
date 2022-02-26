@@ -33,6 +33,17 @@ class RouteTest extends TestCase
         $response->assertStatus(200);
     }    
     
+    public function test_fragment_json_category()
+    {
+        $category = \App\Models\Category::factory()->create();        
+        $categoryId = $category->id;
+        $categoryName = $category->name;
+        
+        $response = $this->getJson('api/categories/' . $categoryId);
+        
+        $response->assertJsonFragment(['id' => $categoryId, 'name' => $categoryName]);
+    }       
+    
     public function test_api_products_json()
     {
         $response = $this->getJson('/api/products'); 
@@ -47,18 +58,7 @@ class RouteTest extends TestCase
         $response = $this->getJson('api/products/' . $productId);
         
         $response->assertJsonFragment(['id' => $productId]);
-    }    
-    
-    public function test_fragment_json_category()
-    {
-        $category = \App\Models\Category::factory()->create();        
-        $categoryId = $category->id;
-        $categoryName = $category->name;
-        
-        $response = $this->getJson('api/categories/' . $categoryId);
-        
-        $response->assertJsonFragment(['id' => $categoryId, 'name' => $categoryName]);
-    }     
+    }         
     
     public function test_photo_product()
     {
