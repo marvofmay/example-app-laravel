@@ -112,4 +112,4 @@ jobs:
         run: php artisan --env=testing migrate        
         
       - name: Run feature tests via Laravel in env.testing              
-        run: php artisan test --filter=Feature  --env.testing
+        run: php artisan test --filter=Feature --env=testing
