@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Services\Product\ProductService;
@@ -10,11 +10,6 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Support\Facades\DB;
 
-/**
- * Description of ProductController
- *
- * @author mjaroszynski
- */
 class ProductController extends Controller
 {
     
