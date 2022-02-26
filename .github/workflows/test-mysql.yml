@@ -103,12 +103,12 @@ jobs:
         run: php artisan cache:clear                       
         
       - name: Run cache clear .env.testing    
-        run: php artisan cache:clear --env.testing                              
+        run: php artisan cache:clear --env=testing                              
         
       - name: Run config clear .env.testing  
-        run: php artisan config:clear --env.testing                       
+        run: php artisan config:clear --env=testing                       
         
-      - name: Run Migrations
+      - name: Run Migrations in .env.testing
         run: php artisan --env=testing migrate        
         
       - name: Run feature tests via Laravel in env.testing              
