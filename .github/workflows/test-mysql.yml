@@ -94,17 +94,7 @@ jobs:
         run: pwd
         
       - name: PHP Version
-        run: php --version         
-        
-      - name: Run Migrations
-        # Set environment
-        env:
-          DB_CONNECTION: mysql
-          DB_DATABASE: laravel
-          DB_PORT: 33306
-          DB_USER: root
-
-        run: php artisan migrate     
+        run: php --version                 
         
       - name: Run config clear   
         run: php artisan config:clear        
@@ -112,12 +102,14 @@ jobs:
       - name: Run cache clear   
         run: php artisan cache:clear                       
         
-      - name: Run feature tests via Laravel
-        env:
-          DB_CONNECTION: mysql
-          DB_DATABASE: laravel
-          DB_PORT: 33306
-          DB_USER: root      
-          DB_PASSWORD:
-              
-        run: php artisan test --filter=Feature
+      - name: Run cache clear .env.testing    
+        run: php artisan cache:clear --env.testing                              
+        
+      - name: Run config clear .env.testing  
+        run: php artisan config:clear --env.testing                       
+        
+      - name: Run Migrations
+        run: php artisan --env=testing migrate        
+        
+      - name: Run feature tests via Laravel in env.testing              
+        run: php artisan test --filter=Feature  --env.testing

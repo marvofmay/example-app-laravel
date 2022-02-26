@@ -16,7 +16,7 @@ class AddEmailToContatTable extends Migration
         Schema::table(
             'contact',
             function (Blueprint $table) {
-                $table->string('email')->index();
+                $table->string('email')->nullable()->index();
             }
         );
     }
