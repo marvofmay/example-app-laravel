@@ -15,7 +15,7 @@ class LoginController extends Controller
      */
     public function show()
     {
-        return view('auth.login');
+        return view('Auth.login');
     }
 
     public function csrftoken()
