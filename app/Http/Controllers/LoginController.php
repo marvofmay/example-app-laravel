@@ -33,13 +33,12 @@ class LoginController extends Controller
     public function login(LoginRequest $request)
     {
         $credentials = $request->getCredentials();
-        //dd('s0');
         if (!Auth::validate($credentials)) :
             return redirect()->to('login')
                 ->withErrors(trans('auth.failed'));
         endif;
-        //dd('s1');
         $user = Auth::getProvider()->retrieveByCredentials($credentials);
+        
         if ($request->wantsJson() || preg_match('/^api\//', $request->path())) {
             return [
                 'isLogged' => true,
@@ -48,9 +47,7 @@ class LoginController extends Controller
                 'token' => $user->createToken('auth_token')->plainTextToken
             ];
         }
-        //dd('s3');
 
-        //dd($user);
         Auth::login($user);
 
         return $this->authenticated($request, $user);
