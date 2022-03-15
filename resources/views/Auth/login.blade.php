@@ -25,7 +25,7 @@
 
         <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
         
-        @include('auth.partials.copy')
+        @include('Auth.Partials.copy')
     </form>
 </div>    
 @endsection
