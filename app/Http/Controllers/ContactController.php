@@ -13,7 +13,7 @@ class ContactController extends Controller
     public function display()
     {
         return view(
-            'contact.display',
+            'Contact.display',
             [
             'page' => 'kontakt',
             'sended' => false

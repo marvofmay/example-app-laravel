@@ -28,7 +28,6 @@
             <li class="nav-item"><a href="{{ route('users.index') }}" class="nav-link">użytkownicy</a></li>
             <li class="nav-item"><a href="{{ route('roles.index') }}" class="nav-link">role</a></li>
             @endrole
-          <li><a href="{{ route('posts.index') }}" class="nav-link px-2 text-white">Posts</a></li>
         @endauth        
       </ul>
       <form class="d-flex">
