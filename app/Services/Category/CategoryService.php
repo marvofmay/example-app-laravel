@@ -45,7 +45,7 @@ class CategoryService {
     public function getCategoryById(int $id) 
     {
         
-         $category = Category::where('id', $id)->first();                
+        $category = Category::where('id', $id)->first();                
         if (!$category) {
             throw new CategoryNotFoundException('Category is not found by id: "' . $id . '"');
         }     
@@ -101,4 +101,17 @@ class CategoryService {
                 
         return $filtredItems;
     }
+    
+    public function getIdsActiveAndNotDeletedCategories () {
+        
+        /** @var $ids array */
+        $ids = [];
+        $categories = Category::where(['active' => 1])->where(['deleted' => 0])->get();
+        
+        foreach ($categories as $category) {
+            $ids[] = $category->id;
+        }
+        
+        return $ids;
+    }    
 }

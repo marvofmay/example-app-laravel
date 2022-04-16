@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Photo;
+use App\Services\Product\ProductService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Storage;
 
@@ -22,18 +23,23 @@ class PhotoFactory extends Factory
      */
     public function definition()
     {
-        $product = \App\Models\Product::factory()->create();
-        if (Storage::makeDirectory('public/uploads/tests/product/' . $product->id)) {
-            if (is_dir('./storage/app/public/uploads/tests/product/' . $product->id)) {
-                $fileName = $this->faker->image('./storage/app/public/uploads/tests/product/' . $product->id, 50, 50, null, false);
+        
+        $productService = new ProductService();
+        $productsIds = $productService->getIdsActiveAndNotDeletedProducts();        
+        
+        $productId = $productsIds[random_int(0, count($productsIds) - 1)];
+        
+        if (Storage::makeDirectory('public/uploads/product/' . $productId)) {
+            if (is_dir('./storage/app/public/uploads/product/' . $productId)) {
+                $fileName = $this->faker->image('./storage/app/public/uploads/product/' . $productId, 50, 50, null, false);
             }
         }
 
         return [
             'name' => $fileName,
-            'filepath' => '/storage/uploads/tests/product/' . $product->id . '/' . $fileName,
-            'product_id' => $product->id,
-            'main' => 1,
+            'filepath' => '/storage/uploads/product/' . $productId . '/' . $fileName,
+            'product_id' => $productId,
+            'main' => 0,
             'active' =>  rand(0, 1),
             'deleted' => rand(0, 1)
         ];

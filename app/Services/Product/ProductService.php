@@ -111,4 +111,36 @@ class ProductService {
         return $filtredItems;
     }         
     
+    public function getIdsActiveAndNotDeletedProducts () {
+        
+        /** @var $ids array */
+        $ids = [];
+        
+        $products = Product::where(['active' => 1])->where(['deleted' => 0])->get();
+        
+        foreach ($products as $product) {
+            $ids[] = $product->id;
+        }
+        
+        return $ids;
+    }        
+    
+    public function getProductIdWithoutMainPhoto () {
+        /** @var $id int */
+        $id = 0;
+        
+        $product = Product::where(['product.active' => 1])
+            ->where(['product.deleted' => 0])
+            ->join('photo', 'photo.product_id', '=', 'product.id')
+            ->where(function($query) {
+                $query
+                    ->where(['photo.product_id' => null])
+                    ->where(['photo.main' => false]);
+            })                
+            ->first();
+        
+        $id = $product->id;        
+        
+        return $id;        
+    }
 }

@@ -22,13 +22,13 @@ class CategoryFactory extends Factory
      */
     public function definition()
     {
-        $name = $this->faker->uuid();
+        $name = $this->faker->unique()->word;
 
         return [
-            'name' => 'category ' . $name,
+            'name' => $name,
             'description' => 'category description for ' . $name,
-            'slug' => Str::slug($name),
-            'active' =>  1,
+            'slug' => Str::slug('category ' . $name, '-'),
+            'active' => $this->faker->numberBetween(0, 1),
             'deleted' => 0
         ];
     }
