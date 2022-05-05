@@ -34,6 +34,7 @@ class ProductFactory extends Factory
             'name' => $name,
             'description' => 'product description for ' . $name,
             'slug' => Str::slug('product ' . $name, '-'),
+            'price' => $this->faker->randomFloat(2, 10, 10000),
             'category_id' => $categoriesIds[random_int(0, count($categoriesIds) - 1)],
             'active' =>  1,
             'deleted' => 0

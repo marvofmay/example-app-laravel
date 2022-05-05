@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Item;
+use Database\Factories\ItemFactory;
 
 class ItemSeeder extends Seeder
 {
@@ -14,6 +14,7 @@ class ItemSeeder extends Seeder
      */
     public function run()
     {
-        Item::factory()->count(100)->create();
+        $itemFactory = new ItemFactory(100);
+        $itemFactory->create();
     }
 }

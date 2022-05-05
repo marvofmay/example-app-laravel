@@ -18,6 +18,6 @@ class PhotoNotFoundException extends Exception
     
     public function render () {
         
-        return view('errors.photo.photoNotFound', ['error' => $this->getMessage()]);
+        return view('Errors.Photo.photoNotFound', ['error' => $this->getMessage()]);
     }
 }

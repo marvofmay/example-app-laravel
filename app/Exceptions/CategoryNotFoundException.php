@@ -18,6 +18,6 @@ class CategoryNotFoundException extends Exception
     
     public function render () {
         
-        return view('errors.category.categoryNotFound', ['error' => $this->getMessage()]);
+        return view('Errors.Category.categoryNotFound', ['error' => $this->getMessage()]);
     }
 }

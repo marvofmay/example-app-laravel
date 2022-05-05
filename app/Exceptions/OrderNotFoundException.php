@@ -4,7 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 
-class ProductNotFoundException extends Exception
+class OrderNotFoundException extends Exception
 {
     
     public function __construct(string $message) { 
@@ -18,6 +18,6 @@ class ProductNotFoundException extends Exception
     
     public function render () {
         
-        return view('Errors.Product.productNotFound', ['error' => $this->getMessage()]);
+        return view('Errors.Order.orderNotFound', ['error' => $this->getMessage()]);
     }
 }

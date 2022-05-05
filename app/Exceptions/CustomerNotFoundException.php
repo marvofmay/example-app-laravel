@@ -18,6 +18,6 @@ class CustomerNotFoundException extends Exception
     
     public function render () {
         
-        return view('errors.customer.customerNotFound', ['error' => $this->getMessage()]);
+        return view('Errors.Customer.customerNotFound', ['error' => $this->getMessage()]);
     }
 }

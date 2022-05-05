@@ -15,6 +15,11 @@ class ProductService {
         return (is_null($category)) ? Product::all()->where('deleted', false) : $category->products;
     }
     
+    public function getAllNotDeletedAndActiveProducts() {
+    
+        return Product::all()->where('deleted', false)->where('active', true);
+    }    
+    
     public function prepareProductModel(Request $request): Product 
     {
 
